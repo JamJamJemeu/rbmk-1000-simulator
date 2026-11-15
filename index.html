@@ -843,16 +843,6 @@ function drawFx(){
   if(EMG&&!CINE){x.fillStyle='rgba(0,0,0,0.42)';x.fillRect(0,0,1100,540);const fl=Math.random()<0.96?0.22:0.08;const g=x.createRadialGradient(550,40,10,550,40,760);g.addColorStop(0,`rgba(255,30,15,${fl})`);g.addColorStop(1,'rgba(255,30,15,0.05)');x.fillStyle=g;x.fillRect(0,0,1100,540);}
   if(GEIG>0){GEIG-=1/60;if(Math.random()<0.25+0.5*(1-GEIG/3))snd.geiger();}
   const c=CINE;if(!c)return;
-  if(c.e2&&c.t>4.6){const a=Math.min(1,(c.t-4.6)*1.5),X=880,Y=380;x.globalAlpha=a;
-    x.fillStyle='#2b2f2a';x.beginPath();x.roundRect?x.roundRect(X,Y,190,120,10):x.rect(X,Y,190,120);x.fill();x.strokeStyle='#0b0c0d';x.lineWidth=3;x.stroke();
-    x.fillStyle='#d9d2b0';x.fillRect(X+12,Y+12,166,62);
-    x.strokeStyle='#222';x.lineWidth=1.5;x.beginPath();x.arc(X+95,Y+72,52,Math.PI*1.15,Math.PI*1.85);x.stroke();
-    for(let i=0;i<=4;i++){const an=Math.PI*1.15+i/4*Math.PI*0.7;x.beginPath();x.moveTo(X+95+Math.cos(an)*46,Y+72+Math.sin(an)*46);x.lineTo(X+95+Math.cos(an)*52,Y+72+Math.sin(an)*52);x.stroke();
-      x.font='700 9px "Roboto Mono",monospace';x.fillStyle='#222';x.textAlign='center';x.fillText(String(i),X+95+Math.cos(an)*38,Y+72+Math.sin(an)*38+3);}
-    const an=Math.PI*1.15+(3.6/4+Math.sin(performance.now()/60)*0.004)*Math.PI*0.7;x.strokeStyle='#b01010';x.lineWidth=2;x.beginPath();x.moveTo(X+95,Y+72);x.lineTo(X+95+Math.cos(an)*50,Y+72+Math.sin(an)*50);x.stroke();
-    x.font='700 11px "Roboto Condensed",sans-serif';x.fillStyle='#d9d2b0';x.textAlign='center';x.fillText(LANG==='pl'?'DP-5 · 3,6 R/h':'ДП-5 · 3,6 Р/ч',X+95,Y+92);
-    x.font='italic 700 10px "Roboto Condensed",sans-serif';x.fillStyle='#f0a81e';x.fillText(LANG==='pl'?'„nie tak źle… chyba?”':'«не так уж плохо… наверное?»',X+95,Y+109);
-    x.globalAlpha=1;}
   if(c.dark>0.01){x.fillStyle=`rgba(0,0,0,${c.dark})`;x.fillRect(0,0,1100,540);
     const fl=Math.random()<0.9?0.18+Math.random()*0.08:0.02;const g=x.createRadialGradient(550,60,10,550,60,700);g.addColorStop(0,`rgba(255,40,20,${fl})`);g.addColorStop(1,'rgba(255,40,20,0)');x.fillStyle=g;x.fillRect(0,0,1100,540);}
   x.lineCap='round';
@@ -860,6 +850,40 @@ function drawFx(){
     x.strokeStyle='rgba(235,240,240,.7)';x.lineWidth=1.1;x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.stroke();}
   for(const d of c.dust){x.fillStyle=`rgba(200,190,170,${d.a})`;x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.fill();}
   if(c.flash>0){x.fillStyle=`rgba(255,250,235,${Math.min(1,c.flash)})`;x.fillRect(0,0,1100,540);}
+  if(c.e2&&c.t>4.6){const a=Math.min(1,(c.t-4.6)*1.5),X=842,Y=328,Wd=220,Hd=150;x.globalAlpha=a;x.save();
+    // корпус ДП-5В – оливковая сталь
+    let g=x.createLinearGradient(0,Y,0,Y+Hd);g.addColorStop(0,'#6b7448');g.addColorStop(1,'#3d4426');
+    x.fillStyle=g;x.beginPath();x.roundRect?x.roundRect(X,Y,Wd,Hd,12):x.rect(X,Y,Wd,Hd);x.fill();
+    x.strokeStyle='#1d2012';x.lineWidth=3;x.stroke();x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=1;x.beginPath();x.moveTo(X+10,Y+2);x.lineTo(X+Wd-10,Y+2);x.stroke();
+    for(const [px,py] of [[X+9,Y+9],[X+Wd-9,Y+9],[X+9,Y+Hd-9],[X+Wd-9,Y+Hd-9]]){const rg=x.createRadialGradient(px-1,py-1,0.5,px,py,4);rg.addColorStop(0,'#cfd2c0');rg.addColorStop(1,'#4a4e3a');x.fillStyle=rg;x.beginPath();x.arc(px,py,3.6,0,7);x.fill();}
+    // табличка
+    x.fillStyle='#d8cfa8';x.font='700 15px "Roboto Condensed",sans-serif';x.textAlign='left';x.fillText('ДП-5В',X+16,Y+24);
+    x.font='700 8px "Roboto Condensed",sans-serif';x.fillStyle='#b9b18c';x.fillText('ИЗМЕРИТЕЛЬ МОЩНОСТИ ДОЗЫ',X+66,Y+22);
+    // окно прибора
+    const mx=X+14,my=Y+32,mw=128,mh=82;x.fillStyle='#111';x.fillRect(mx-3,my-3,mw+6,mh+6);
+    g=x.createLinearGradient(0,my,0,my+mh);g.addColorStop(0,'#efe6c6');g.addColorStop(1,'#d6caa0');x.fillStyle=g;x.fillRect(mx,my,mw,mh);
+    const cx=mx+mw/2,cy=my+mh-10,R=60,A0=Math.PI*1.18,A1=Math.PI*1.82,ang=v=>A0+(v/5)*(A1-A0);
+    x.strokeStyle='#c22';x.lineWidth=4;x.beginPath();x.arc(cx,cy,R-3,ang(4),ang(5));x.stroke();
+    x.strokeStyle='#1a1a1a';x.lineWidth=1.3;x.beginPath();x.arc(cx,cy,R,A0,A1);x.stroke();
+    for(let i=0;i<=50;i++){const v=i/10,an=ang(v),L=i%10===0?9:i%5===0?6:3;x.lineWidth=i%10===0?1.6:0.8;x.beginPath();x.moveTo(cx+Math.cos(an)*R,cy+Math.sin(an)*R);x.lineTo(cx+Math.cos(an)*(R-L),cy+Math.sin(an)*(R-L));x.stroke();
+      if(i%10===0){x.font='700 10px "Roboto Mono",monospace';x.fillStyle='#1a1a1a';x.textAlign='center';x.fillText(String(v),cx+Math.cos(an)*(R-17),cy+Math.sin(an)*(R-17)+3);}}
+    x.font='700 9px "Roboto Condensed",sans-serif';x.fillStyle='#333';x.textAlign='center';x.fillText('Р/ч',cx,cy-14);
+    const na=ang(3.6+Math.sin(performance.now()/70)*0.03);x.strokeStyle='#111';x.lineWidth=1.8;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(na)*(R-2),cy+Math.sin(na)*(R-2));x.stroke();
+    x.fillStyle='#222';x.beginPath();x.arc(cx,cy,4,0,7);x.fill();
+    // переключатель поддиапазонов
+    const kx=X+Wd-40,ky=Y+70;x.font='700 7px "Roboto Condensed",sans-serif';x.fillStyle='#d8cfa8';
+    ['РЕЖ','×1000','×100','×10','×1'].forEach((l,i)=>{const an=Math.PI*0.8+i*Math.PI*0.35;x.fillText(l,kx+Math.cos(an)*31,ky+Math.sin(an)*31+3);});
+    g=x.createRadialGradient(kx-5,ky-5,2,kx,ky,22);g.addColorStop(0,'#3a3a3a');g.addColorStop(1,'#0c0c0c');x.fillStyle=g;x.beginPath();x.arc(kx,ky,21,0,7);x.fill();
+    x.strokeStyle='#e8dfbf';x.lineWidth=2.5;x.beginPath();const ka=Math.PI*0.8+4*Math.PI*0.35;x.moveTo(kx,ky);x.lineTo(kx+Math.cos(ka)*17,ky+Math.sin(ka)*17);x.stroke();
+    // лампа
+    x.fillStyle=Math.floor(performance.now()/350)%2?'#ff3b2f':'#5a1410';x.beginPath();x.arc(X+Wd-40,Y+Hd-22,6,0,7);x.fill();
+    x.font='700 7px "Roboto Condensed",sans-serif';x.fillStyle='#d8cfa8';x.fillText('КОНТР.',X+Wd-40,Y+Hd-8);
+    x.font='700 8px "Roboto Mono",monospace';x.fillStyle='#b9b18c';x.textAlign='left';x.fillText('№ 0426 · 1986',X+16,Y+Hd-10);
+    x.restore();
+    // подпись
+    x.font='italic 700 12px "Roboto Condensed",sans-serif';x.textAlign='center';{const q=LANG==='pl'?'„Nie świetnie, ale też nie tragicznie.”':'«Не отлично, но и не ужасно.»',qw=x.measureText(q).width;x.fillStyle='rgba(0,0,0,.85)';x.fillRect(X+Wd/2-qw/2-8,Y+Hd+5,qw+16,19);}x.fillStyle='#f0a81e';
+    x.fillText(LANG==='pl'?'„Nie świetnie, ale też nie tragicznie.”':'«Не отлично, но и не ужасно.»',X+Wd/2,Y+Hd+18);
+    x.globalAlpha=1;}
 }
 /* ===================== INPUT ===================== */
 function act(a,el){
