@@ -6,8 +6,8 @@
 
 by **JamJam**
 
-<p align="center"><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/"><img src="docs/play.png" alt="▶ Zagraj online · Play now · Играть" width="860"></a></p>
-<p align="center"><sub>Kliknij, żeby zagrać w przeglądarce – telefon (poziomo) lub komputer · Click to play · Нажмите, чтобы играть<br><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/">https://jamjamjemeu.github.io/rbmk-1000-simulator/</a></sub></p>
+<p align="center"><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/"><img src="docs/play.png" alt="▶ Uruchom · Play now · Играть" width="720"></a></p>
+<p align="center"><sub>Kliknij, żeby uruchomić grę w przeglądarce – telefon (poziomo) lub komputer · Click to play · Нажмите, чтобы играть<br><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/">https://jamjamjemeu.github.io/rbmk-1000-simulator/</a></sub></p>
 
 | Pulpit (PL) | Пульт (RU) |
 |---|---|
