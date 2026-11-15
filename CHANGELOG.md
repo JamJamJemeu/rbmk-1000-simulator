@@ -1,5 +1,17 @@
 # Changelog / Historia zmian / История изменений
 
+## 1.0.4 — 2026-11-15
+
+**PL**
+- Odtworzenie: od wciśnięcia AZ-5 akcja idzie w zwolnionym tempie (×0.3), a opisy 01:23:40–01:23:47 zostają na pasku, dopóki da się je przeczytać – także w trakcie animacji wybuchu.
+- Opis 01:23:40 uzupełniony: moc była stabilna, powód wciśnięcia AZ-5 do dziś nie jest pewny.
+
+**EN**
+- Replay: slow motion after AZ-5 and the final captions stay on screen long enough to read, also during the explosion.
+
+**RU**
+- Запись: после АЗ-5 замедленное воспроизведение, последние подписи остаются на экране достаточно долго.
+
 ## 1.0.3 — 2026-11-15
 
 **PL**

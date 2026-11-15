@@ -703,13 +703,19 @@ const RK=[
  {m:D2+83+4/60,phys:1,
   txt:'01:23:04 – start testu. Zamknięto zawory turbiny nr 8. Cztery pompy zasilane z wybiegającej turbiny zwalniają, przepływ maleje, w kanałach przybywa pary. Regulator АР wsuwa pręty, żeby utrzymać moc.'}
 ];
-const RP_AZ='01:23:40 – pada polecenie wyłączenia reaktora; Toptunow wciska АЗ‑5. Wszystkie pręty ruszają w dół z górnego położenia… a ich grafitowe końcówki najpierw wypychają wodę z dolnej części rdzenia. Patrz na kartogram i zegar МОЩНОСТЬ.';
+const RP_AZ='01:23:40 – moc jest stabilna, wybieg turbiny dobiega końca. Pada polecenie wyłączenia reaktora (powód do dziś nie jest pewny – najpewniej planowe zakończenie testu); Toptunow wciska АЗ‑5. Wszystkie pręty ruszają w dół z górnego położenia… a ich grafitowe końcówki najpierw wypychają wodę z dolnej części rdzenia. Patrz na kartogram i zegar МОЩНОСТЬ.';
 const RP_530='01:23:43 – moc przekracza 530 MW i rośnie lawinowo, sygnały АЗМ i АЗС. Pręty stają po wejściu na ok. 2–2,5 m – kanały paliwowe już się deformują.';
 const RP_E1='01:23:44 – moc chwilowo ok. 100× nominalnej. Paliwo rozpada się, para rozrywa kanały – pierwszy wybuch podrywa ważącą ok. 1000 t górną płytę reaktora.';
 const RP_E2='Kilka sekund później drugi wybuch. Rdzeń zniszczony, rozżarzony grafit i paliwo wylatują na zewnątrz. Na pulpicie gaśnie światło, sypie się pył z sufitu.';
 let RP=null;
 function capShow(time,txt,mini){const c=$('cap');c.classList.remove('hidden');if(!stage.classList.contains('rp')){stage.classList.add('rp');fit();}$('capT').textContent=time;$('capX').textContent=lat(txt);}
-function capHide(){$('cap').classList.add('hidden');if(stage.classList.contains('rp')){stage.classList.remove('rp');fit();}}
+let CQ=[],capCur=null;
+function capMin(txt){return Math.max(7,txt.length/17);}
+function capPush(time,txt){if(!RP){capShow(time,txt,true);return;}if(!capCur||capCur.age>=capCur.min){capCur={time,txt,age:0,min:capMin(txt)};capShow(time+SLOWTAG(),txt,true);}else CQ.push({time,txt});}
+function SLOWTAG(){return RP&&RP.az?'  ⏱ ×0.3':'';}
+function capFrame(dt){if(!capCur)return;capCur.age+=dt;if(capCur.age>=capCur.min&&CQ.length){const n=CQ.shift();capCur={time:n.time,txt:n.txt,age:0,min:capMin(n.txt)};capShow(n.time+SLOWTAG(),n.txt,true);}}
+function capDone(){return !capCur||(CQ.length===0&&capCur.age>=capCur.min);}
+function capHide(){CQ=[];capCur=null;$('cap').classList.add('hidden');if(stage.classList.contains('rp')){stage.classList.remove('rp');fit();}}
 function replayStart(){
   EGG=null;$('bTest').style.display='none';snd.rumble(false);newState();LOG.length=0;CINE=null;S.secMode=false;S.prot=true;S.arAuto=false;S.dateStr='25.04.86';S.rp=true;
   RP={i:0,t:0,paused:false,phys:false,pt:0,az:false,m530:false,from:null};
@@ -721,7 +727,7 @@ function replayEnter(i){
   if(k.phys){
     RP.phys=true;RP.pt=0;S.dateStr='26.04.86';
     loadChernobylState();S.chern=true;S.tmin=Math.floor(k.m);S.tacc=k.m-Math.floor(k.m);S.secMode=true;S.plan=200;
-    startTest();capShow(hhmmss(k.m),k.txt,true);$('bRpN').disabled=true;return;
+    startTest();capCur=null;CQ=[];capPush(hhmmss(k.m),k.txt);$('bRpN').disabled=true;return;
   }
   RP.from=rkState();if(i===0){RP.from={n:1,R:k.R,X:1,m:k.m};}
   if(k.date)S.dateStr=k.date;S.plan=k.plan;
@@ -733,12 +739,13 @@ function replayEnter(i){
 function replayFrame(dt){
   if(RP.paused)return;
   if(RP.phys){
-    const n=Math.ceil(dt/0.01),h=dt/n;
+    capFrame(dt);const reading=capCur&&capCur.age<capCur.min;const sdt=RP.az?dt*(reading?0.06:0.3):dt;
+    const n=Math.ceil(sdt/0.01),h=sdt/n;
     for(let i=0;i<n&&game==='replay';i++){
       S.t+=h;physStep(h,h/60);RP.pt+=h;S.tacc+=h/60;if(S.tacc>=1){S.tacc-=1;S.tmin+=1;}
       if(!RP.az&&RP.pt>=34.6&&!coverOpen){coverOpen=true;coverT=5;$('cover').classList.add('open');snd.toggle();}
-      if(!RP.az&&RP.pt>=36){RP.az=true;$('az5').classList.add('pressed');setTimeout(()=>$('az5').classList.remove('pressed'),600);log('АКИМОВ: ГЛУШИ РЕАКТОР!','hot');scram('КНОПКА АЗ-5 (ОПЕРАТОР)');capShow('01:23:40',RP_AZ,true);}
-      if(RP.az&&!RP.m530&&S.n*NOM>530){RP.m530=true;capShow('01:23:43',RP_530,true);}
+      if(!RP.az&&RP.pt>=36){RP.az=true;$('az5').classList.add('pressed');setTimeout(()=>$('az5').classList.remove('pressed'),600);log('АКИМОВ: ГЛУШИ РЕАКТОР!','hot');scram('КНОПКА АЗ-5 (ОПЕРАТОР)');capCur=null;CQ=[];capPush('01:23:40',RP_AZ);}
+      if(RP.az&&!RP.m530&&S.n*NOM>530){RP.m530=true;capPush('01:23:43',RP_530);}
       if(RP.pt>60&&!S.over){explode();}
     }
     return;
@@ -803,6 +810,7 @@ function makeCracks(cx,cy,n){const out=[];for(let r=0;r<n;r++){let a=Math.random
     if(Math.random()<0.18)out.push(...makeCracksBranch(x,y,a));}out.push(pts);}return out;}
 function makeCracksBranch(x,y,a){const pts=[[x,y]];let b=a+(Math.random()<0.5?1:-1)*(0.6+Math.random()*0.6);for(let i=0;i<4;i++){x+=Math.cos(b)*8;y+=Math.sin(b)*8;b+=(Math.random()-0.5)*0.6;pts.push([x,y]);}return [pts];}
 function cineFrame(dt){
+  if(RP){capFrame(dt);dt*=(capCur&&capCur.age<capCur.min)?0.2:0.5;}
   const c=CINE;c.t+=dt;if(S.secMode&&!c.e2){S.tacc+=dt/60;}
   S.n=Math.min(150,S.n*Math.exp(dt*3.2));S.rho=Math.min(1.6,S.rho+dt);S.void=Math.min(1,S.void+dt*0.4);S.Tf+=dt*2;
   if(!c.e1){c.shake=Math.min(16,3+c.t*9);}
@@ -810,20 +818,20 @@ function cineFrame(dt){
     c.e1=true;c.flash=1.1;c.shake=28;snd.boom();log('ВЗРЫВ','hot');S.F=0.12;
     c.cracks.push(...makeCracks(436,150,6),...makeCracks(178,215,5));
     for(const k of Object.keys(lampEl))if(Math.random()<0.35)c.dead.add(k);
-    if(RP||S.scen)capShow('01:23:44',RP_E1,true);
+    if(RP||S.scen)capPush('01:23:44',RP_E1);
   }
   if(!c.e2&&c.t>=3.4){
     c.e2=true;c.flash=1.5;c.shake=40;snd.boom2();snd.rumble(false);
     c.cracks.push(...makeCracks(610,150,6),...makeCracks(880,170,5),...makeCracks(180,440,4));
     for(const k of Object.keys(lampEl))if(Math.random()<0.5)c.dead.add(k);
     for(let i=0;i<260;i++)c.dust.push({x:Math.random()*1100,y:-Math.random()*540,v:20+Math.random()*60,r:0.6+Math.random()*1.8,a:0.3+Math.random()*0.5});
-    if(RP||S.scen)capShow('01:23:47',RP_E2,true);
+    if(RP||S.scen)capPush('01:23:47',RP_E2);
   }
   c.flash=Math.max(0,c.flash-dt*1.4);
   if(c.e1)c.shake=Math.max(c.e2?0.8:2,c.shake-dt*(c.e2?14:18));
   c.dark+=((c.e2?0.84:0)-c.dark)*Math.min(1,dt*1.2);
   for(const d of c.dust){d.y+=d.v*dt;d.x+=Math.sin(d.y/30)*dt*8;if(d.y>545){d.y=-5;d.x=Math.random()*1100;}}
-  if(!c.end&&c.t>=(RP?9:7.5)){c.end=true;if(RP)replayEnd();else if(S.scen&&!S.egg)gameOver('scen');else gameOver('boom');}
+  if(!c.end&&c.t>=(RP?9:7.5)&&(!RP||capDone())){c.end=true;if(RP)replayEnd();else if(S.scen&&!S.egg)gameOver('scen');else gameOver('boom');}
 }
 function drawFx(){
   const {x}=CANV.fx;x.clearRect(0,0,1100,540);
