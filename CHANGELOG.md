@@ -1,5 +1,17 @@
 # Changelog / Historia zmian / История изменений
 
+## 1.0.1 — 2026-11-15
+
+**PL**
+- Gdy plik otworzy się w podglądzie bez JavaScriptu (Messenger, WhatsApp, Gmail, podgląd plików), zamiast pustej strony pojawia się instrukcja, jak go otworzyć w przeglądarce. Przy błędzie uruchomienia wyświetla się jego treść.
+- Lepsza zgodność ze starszymi przeglądarkami.
+
+**EN**
+- When the file is opened in a preview without JavaScript, a message explains how to open it in a browser instead of a blank page; startup errors are shown on screen. Better compatibility with older browsers.
+
+**RU**
+- При открытии в просмотрщике без JavaScript вместо пустой страницы показывается подсказка; ошибки запуска выводятся на экран. Улучшена совместимость со старыми браузерами.
+
 ## 1.0.0 — 2026-11-15
 
 **PL**
