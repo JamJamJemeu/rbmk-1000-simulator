@@ -1,0 +1,29 @@
+RBMK-1000 · БЩУ
+Copyright (c) 2026 JamJam. Wszelkie prawa zastrzezone.
+All rights reserved.
+
+Ta gra (kod, grafika, uklad pulpitu, dzwieki, teksty) zostala stworzona od podstaw
+dla autora wskazanego powyzej. Bez pisemnej zgody autora nie wolno jej rozpowszechniac,
+modyfikowac ani sprzedawac, z wyjatkiem uzytku wlasnego. Publikacja kodu zrodlowego
+na GitHubie nie daje zadnego z tych praw.
+
+Gra jest uproszczonym modelem edukacyjno-rozrywkowym i nie jest narzedziem do nauki
+obslugi rzeczywistych reaktorow. Odtworzenie wydarzen z 25-26.04.1986 przedstawia
+przebieg zdarzen w uproszczeniu; wartosci liczbowe sa przyblizone.
+
+Czcionki Roboto Condensed i Roboto Mono sa ladowane z Google Fonts i podlegaja
+licencji Apache 2.0 / SIL Open Font License.
+
+---------------------------------------------------------------------------------
+English:
+This game (code, graphics, panel layout, sounds, texts) was created from scratch by
+the author named above. Without the author's written permission it may not be
+redistributed, modified or sold, except for personal use. Publishing the source code
+on GitHub does not grant any of these rights.
+
+The game is a simplified educational/entertainment model and is not a training tool
+for real reactors. The replay of the events of 25-26 April 1986 is simplified;
+numerical values are approximate.
+
+The Roboto Condensed and Roboto Mono fonts are loaded from Google Fonts and are
+subject to their own licenses (Apache 2.0 / SIL Open Font License).

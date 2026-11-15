@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1d4f4b">
+<title>РБМК-1000 · БЩУ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@500;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--line:#3a3c3e;--ink:#c4c6c4;--cream:#e6e3d6;--amber:#f0a81e;--bg:#18191a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#0c1312;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;font-family:'Roboto Condensed','Arial Narrow',system-ui,sans-serif}
+#stage{position:absolute;left:0;top:0;width:1100px;height:540px;transform-origin:0 0}
+.frame{position:absolute;inset:0;border-radius:16px;
+ background:
+  radial-gradient(circle at 7% 92%,rgba(255,255,255,.10) 0 3px,transparent 4px),
+  radial-gradient(circle at 63% 3%,rgba(255,255,255,.12) 0 2px,transparent 3px),
+  radial-gradient(circle at 97% 40%,rgba(0,0,0,.25) 0 5px,transparent 6px),
+  radial-gradient(circle at 30% 99%,rgba(255,255,255,.10) 0 3px,transparent 4px),
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .38 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+  linear-gradient(160deg,#3d958d 0%,#2c7570 45%,#21605b 100%);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -3px 6px rgba(0,0,0,.4),0 6px 24px rgba(0,0,0,.6)}
+.scr{position:absolute;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e8e8e2,#8d8f8c 55%,#4a4c4b);box-shadow:0 1px 2px rgba(0,0,0,.6)}
+.scr::after{content:'';position:absolute;left:2px;right:2px;top:5.5px;height:2px;background:#3a3b3b;transform:rotate(var(--r,35deg))}
+#inner{position:absolute;left:12px;top:12px;width:1076px;height:516px;border-radius:9px;background:linear-gradient(180deg,#1c1d1f,#151617);box-shadow:inset 0 0 0 2px #0b0c0d,inset 0 3px 10px rgba(0,0,0,.8)}
+.sec{position:absolute;border:1.5px solid var(--line);border-radius:4px}
+.sec>.lbl{position:absolute;top:-9px;left:14px;padding:0 7px;background:#19191b;font-weight:700;font-size:13px;letter-spacing:2.6px;color:var(--ink);line-height:16px;white-space:nowrap}
+.cap{font-weight:700;font-size:11px;letter-spacing:2px;color:#b6b8b7;text-align:center;white-space:nowrap}
+/* header */
+#hdr{position:absolute;left:10px;top:6px;width:1056px;height:44px}
+#hdr .title{position:absolute;left:8px;top:3px;font-size:25px;font-weight:700;letter-spacing:7px;color:var(--cream)}
+#hdr .sub{position:absolute;left:262px;top:13px;font-size:12px;font-weight:700;letter-spacing:3px;color:#8f9294}
+#clkbox{position:absolute;left:520px;top:2px;display:flex;align-items:center;gap:10px}
+.hbtns{position:absolute;right:0;top:4px;display:flex;gap:6px}
+/* drum counters */
+.drum{display:inline-flex;gap:2px;padding:3px;background:#0b0c0d;border-radius:6px;box-shadow:inset 0 0 0 1.5px #2c2e30,0 1px 0 rgba(255,255,255,.06)}
+.drum span{display:inline-block;width:19px;height:30px;line-height:30px;text-align:center;font-family:'Roboto Mono',monospace;font-weight:700;font-size:22px;color:var(--cream);border-radius:2px;
+ background:linear-gradient(180deg,#050505 0%,#232425 22%,#2c2e30 50%,#232425 78%,#050505 100%);text-shadow:0 1px 0 #000}
+.drum.sm span{width:15px;height:24px;line-height:24px;font-size:17px}
+.drum span.sep{width:9px;background:none;color:#9a9c9a}
+/* buttons */
+button{font-family:inherit}
+.pb{height:32px;min-width:46px;padding:0 10px;border:none;border-radius:6px;font-weight:700;font-size:13px;letter-spacing:1.6px;color:#cfd1cf;cursor:pointer;
+ background:linear-gradient(180deg,#2c2e30,#18191b);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1.5px #0b0c0d,0 2px 3px rgba(0,0,0,.6)}
+.pb:active,.pb.down{background:linear-gradient(180deg,#151617,#232425);transform:translateY(1px)}
+.pb.sel{color:#1a1a1a;background:linear-gradient(180deg,#ffe08a,#e39a1a);box-shadow:0 0 10px rgba(240,168,30,.55),0 0 0 1.5px #0b0c0d}
+.arr{width:38px;height:32px;padding:0;font-size:15px;color:var(--cream)}
+.lb{border:none;border-radius:6px;font-weight:700;letter-spacing:1.5px;cursor:pointer;color:#5b5f5c;
+ background:linear-gradient(180deg,#2a2c2e,#1a1b1c);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 2px #0b0c0d,0 2px 3px rgba(0,0,0,.6)}
+.lb.g{color:#4f7a5c;background:linear-gradient(180deg,#22392b,#16241b)}
+.lb.g.on{color:#0f2a17;background:linear-gradient(180deg,#bdf5cf,#6fd894);box-shadow:0 0 14px rgba(110,230,150,.6),0 0 0 2px #0b0c0d}
+.lb.a{color:#7a6230;background:linear-gradient(180deg,#3a3020,#241d12)}
+.lb.a.on{color:#2a1a05;background:linear-gradient(180deg,#ffe08a,#f0a020);box-shadow:0 0 14px rgba(240,168,30,.65),0 0 0 2px #0b0c0d}
+.lb.r{color:#7a3a30;background:linear-gradient(180deg,#3a201c,#261412)}
+.lb.r.on{color:#2a0805;background:linear-gradient(180deg,#ff9b85,#e5402c);box-shadow:0 0 16px rgba(240,70,40,.7),0 0 0 2px #0b0c0d}
+.blink{animation:bl .5s steps(1) infinite}
+@keyframes bl{50%{filter:brightness(.35);box-shadow:0 0 0 2px #0b0c0d}}
+/* annunciator */
+.lamp{position:absolute;width:66px;height:27px;border-radius:3px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;line-height:10px;font-weight:700;letter-spacing:.6px;
+ color:#5e4630;background:linear-gradient(180deg,#2b211a,#1d1612);box-shadow:inset 0 0 0 1px #0b0c0d,inset 0 0 6px rgba(0,0,0,.8)}
+.lamp.on.a{color:#2a1a05;background:linear-gradient(180deg,#ffd77a,#f0a020);box-shadow:0 0 12px rgba(240,168,30,.6)}
+.lamp.on.r{color:#2a0805;background:linear-gradient(180deg,#ff9b85,#e5402c);box-shadow:0 0 12px rgba(240,70,40,.65)}
+/* VFD */
+#vfd{position:absolute;left:8px;top:12px;right:8px;bottom:8px;border-radius:6px;padding:7px 10px;background:linear-gradient(180deg,#120c06,#1d1209);box-shadow:inset 0 0 0 1.5px #2c2e30,inset 0 2px 10px rgba(0,0,0,.9);
+ font-family:'Roboto Mono',monospace;font-weight:700;font-size:12.5px;line-height:16.5px;color:#f0a020;text-shadow:0 0 6px rgba(240,150,20,.7);white-space:pre;overflow:hidden}
+#vfd .dim{color:#a5701a;text-shadow:0 0 4px rgba(240,150,20,.4)}
+#vfd .hot{color:#ff6a3a;text-shadow:0 0 6px rgba(255,80,40,.8)}
+/* toggle */
+.tog{position:absolute;width:44px;height:64px;cursor:pointer}
+.tog .base{position:absolute;left:10px;top:22px;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d8dad6,#7a7d7f 60%,#3a3c3d);box-shadow:0 2px 3px rgba(0,0,0,.7)}
+.tog .lev{position:absolute;left:18px;top:4px;width:8px;height:30px;border-radius:4px;background:linear-gradient(90deg,#8d8f8c,#f2f0e6,#8d8f8c);transform-origin:50% 100%;transition:transform .12s;box-shadow:0 1px 2px rgba(0,0,0,.6)}
+.tog .lev::before{content:'';position:absolute;left:-3px;top:-4px;width:14px;height:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#a9aba8 60%,#5a5c5b)}
+.tog.off .lev{transform:rotate(180deg)}
+#hdr.sec2 .sub{display:none}
+#hdr.sec2 #clkbox{left:300px}
+/* AZ-5 */
+#az5wrap{position:absolute;left:14px;top:6px;width:66px;height:66px;border-radius:50%;cursor:pointer;
+ background:repeating-linear-gradient(45deg,#f0c020 0 6px,#151515 6px 12px);box-shadow:0 0 0 2px #0b0c0d,0 2px 4px rgba(0,0,0,.7)}
+#az5{position:absolute;left:8px;top:8px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ff8a70,#d42316 55%,#6a0a05);box-shadow:0 3px 0 #4a0603,0 4px 6px rgba(0,0,0,.7);
+ display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;letter-spacing:1px;color:#ffe6df;text-shadow:0 1px 1px #500}
+#az5.pressed{transform:translateY(2px);box-shadow:0 1px 0 #4a0603}
+#cover{position:absolute;left:2px;top:2px;width:62px;height:62px;border-radius:50%;background:linear-gradient(160deg,rgba(255,120,100,.55),rgba(160,20,10,.55));border:2px solid rgba(255,190,180,.6);
+ box-shadow:inset 0 3px 8px rgba(255,255,255,.35);transition:transform .2s,opacity .2s;transform-origin:50% 0}
+#cover.open{transform:perspective(200px) rotateX(75deg) translateY(-10px);opacity:.55}
+/* overlay */
+#ov{position:absolute;left:12px;top:12px;width:1076px;height:516px;border-radius:9px;background:rgba(6,9,9,.86);display:flex;align-items:center;justify-content:center;z-index:5}
+#ov.hidden{display:none}
+.plaque button{touch-action:manipulation}
+.plaque{position:relative;width:820px;max-height:470px;overflow:auto;padding:22px 30px;border-radius:8px;background:linear-gradient(180deg,#1f2022,#161718);box-shadow:0 0 0 2px #0b0c0d,0 0 0 6px #2c7570,0 10px 30px rgba(0,0,0,.8);color:#d6d4cb;font-size:15px;line-height:21px;touch-action:pan-y}
+.plaque h1{margin:0 0 4px;font-size:34px;letter-spacing:8px;color:var(--cream);text-align:center}
+.plaque h2{margin:14px 0 4px;font-size:15px;letter-spacing:3px;color:var(--amber)}
+.plaque .c{text-align:center}
+.plaque p{margin:6px 0}
+.plaque b{color:#fff}
+.plaque .row{display:flex;justify-content:center;gap:14px;margin-top:16px}
+.plaque .big{height:46px;font-size:16px;padding:0 26px}
+.stat{font-family:'Roboto Mono',monospace;color:var(--amber);text-shadow:0 0 6px rgba(240,150,20,.5)}
+#rot{position:fixed;inset:0;background:#0c1312;color:#e6e3d6;display:none;align-items:center;justify-content:center;text-align:center;font-size:22px;letter-spacing:2px;z-index:9}
+@media (orientation:portrait) and (max-width:820px){#rot{display:flex}}
+#cap{position:absolute;left:0;right:0;top:548px;height:68px;z-index:6;background:linear-gradient(180deg,#1c1d1f,#121314);border:2px solid #2c7570;border-radius:10px;padding:6px 10px 6px 14px;display:flex;gap:14px;align-items:center;color:#e6e3d6;font-size:13.5px;line-height:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.7)}
+#cap.hidden{display:none}
+#capT{font-family:'Roboto Mono',monospace;font-weight:700;color:#f0a020;text-shadow:0 0 6px rgba(240,150,20,.6);font-size:17px;white-space:nowrap;line-height:22px}
+#capX{flex:1}
+#capB{display:flex;gap:6px}
+#cap.unused{left:22px;right:auto;top:364px;bottom:auto;width:310px;height:156px;flex-direction:column;align-items:stretch;gap:4px;padding:8px 10px;font-size:13px;line-height:17px;overflow:hidden}
+#cap.mini #capT{font-size:15px}
+#cap.mini #capB{display:none}
+#plate{position:absolute;left:50%;top:529px;transform:translateX(-50%);padding:0 12px;height:11px;line-height:11px;border-radius:3px;font-size:8.5px;font-weight:700;letter-spacing:2.5px;color:#cfd8d6;background:linear-gradient(180deg,#b9bdb8,#7d827f);color:#2a2c2c;box-shadow:0 1px 1px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4);white-space:nowrap}
+#fx{position:absolute;left:0;top:0;width:1100px;height:540px;pointer-events:none;z-index:4}
+</style>
+</head>
+<body>
+<div id="rot"><div>↻<br>ПОВЕРНИТЕ ТЕЛЕФОН<br><span style="font-size:15px;color:#9a9c9a">Obróć telefon poziomo</span></div></div>
+<div id="stage">
+ <div class="frame">
+  <i class="scr" style="left:7px;top:7px;--r:20deg"></i><i class="scr" style="right:7px;top:7px;--r:-40deg"></i>
+  <i class="scr" style="left:7px;bottom:7px;--r:80deg"></i>
+  <div id="plate"><span data-t="ИЗГОТОВИТЕЛЬ">ИЗГОТОВИТЕЛЬ</span> · JAMJAM</div><i class="scr" style="right:7px;bottom:7px;--r:5deg"></i>
+ </div>
+ <div id="inner">
+  <div id="hdr">
+   <div class="title">РБМК-1000</div>
+   <div class="sub">БЩУ · ПУЛЬТ СИУР</div>
+   <div id="clkbox"><div class="drum" id="clk"></div><div class="cap" style="text-align:left"><span data-t="ВРЕМЯ">ВРЕМЯ</span><br><span data-t="СМЕНА">СМЕНА</span> <span id="shiftNo" style="color:var(--cream)">1</span></div></div>
+   <div class="hbtns">
+    <button class="pb sel" data-act="spd1">×1</button><button class="pb" data-act="spd10">×10</button>
+    <button class="pb" data-act="snd" id="bSnd">ЗВУК</button><button class="pb a" id="bTest" data-act="test" style="display:none">ТЕСТ</button><button class="pb" data-act="pause">ПАУЗА</button><button class="pb" data-act="help">?</button>
+   </div>
+  </div>
+
+  <div class="sec" style="left:10px;top:60px;width:310px;height:280px"><div class="lbl">КАРТОГРАММА А.З.</div>
+   <canvas id="cmap" style="position:absolute;left:24px;top:12px;width:260px;height:260px"></canvas></div>
+  <div class="sec" style="left:10px;top:352px;width:310px;height:156px"><div class="lbl">ЭВМ «СКАЛА» · ЖУРНАЛ</div><div id="vfd"></div></div>
+
+  <div class="sec" style="left:332px;top:60px;width:360px;height:280px"><div class="lbl">КОНТРОЛЬ</div>
+   <canvas id="gPow" style="position:absolute;left:6px;top:10px;width:172px;height:132px"></canvas>
+   <canvas id="gRho" style="position:absolute;left:180px;top:10px;width:172px;height:132px"></canvas>
+   <canvas id="gFlow" style="position:absolute;left:6px;top:142px;width:172px;height:132px"></canvas>
+   <canvas id="gVoid" style="position:absolute;left:180px;top:142px;width:172px;height:132px"></canvas>
+  </div>
+  <div class="sec" style="left:332px;top:352px;width:360px;height:66px"><div class="lbl">ПОКАЗАТЕЛИ</div>
+   <div style="position:absolute;left:14px;top:10px"><div class="drum" id="dOzr"></div><div class="cap" style="margin-top:2px">ОЗР, СТ.</div></div>
+   <div style="position:absolute;left:84px;top:10px;display:flex;gap:4px;align-items:flex-start">
+     <div><div class="drum" id="dSet"></div><div class="cap" style="margin-top:2px">ЗАДАТЧИК АР</div></div>
+     <div style="display:flex;flex-direction:column;gap:2px"><button class="pb arr" style="height:18px;font-size:10px" data-act="setUp">▲</button><button class="pb arr" style="height:18px;font-size:10px" data-act="setDn">▼</button></div>
+   </div>
+   <div style="position:absolute;left:250px;top:10px"><div class="drum" id="dPer"></div><div class="cap" style="margin-top:2px">ПЕРИОД, С</div></div>
+  </div>
+  <div class="sec" style="left:332px;top:430px;width:360px;height:78px"><div class="lbl">СИГНАЛИЗАЦИЯ</div><div id="lamps"></div>
+   <button class="lb a" id="bKvit" data-act="kvit" style="position:absolute;left:292px;top:12px;width:58px;height:58px;font-size:12px">КВИТ</button></div>
+
+  <div class="sec" style="left:704px;top:60px;width:362px;height:280px"><div class="lbl">СУЗ · ПОЛОЖЕНИЕ СТЕРЖНЕЙ</div>
+   <canvas id="rods" style="position:absolute;left:6px;top:12px;width:348px;height:214px"></canvas>
+   <div style="position:absolute;left:6px;top:232px;width:348px;display:flex">
+    <div style="width:87px;display:flex;gap:4px;justify-content:center"><button class="pb arr" data-hold="RRup">▲</button><button class="pb arr" data-hold="RRdn">▼</button></div>
+    <div style="width:87px;display:flex;justify-content:center"><button class="lb g" id="bAR" data-act="ar" style="width:72px;height:32px;font-size:13px">АВТ</button></div>
+    <div style="width:87px;display:flex;gap:4px;justify-content:center"><button class="pb arr" data-hold="USPup">▲</button><button class="pb arr" data-hold="USPdn">▼</button></div>
+    <div style="width:87px;display:flex;justify-content:center"><button class="lb a" id="bVzv" data-act="vzvod" style="width:72px;height:32px;font-size:12px">ВЗВОД</button></div>
+   </div>
+  </div>
+  <div class="sec" style="left:704px;top:352px;width:362px;height:66px"><div class="lbl">ГЦН · НАСОСЫ</div><div id="pumps"></div></div>
+  <div class="sec" style="left:704px;top:430px;width:362px;height:78px"><div class="lbl">АВАРИЙНАЯ ЗАЩИТА</div>
+   <div id="az5wrap" data-act="az5"><div id="az5" data-t="АЗ-5">АЗ-5</div><div id="cover"></div></div>
+   <div class="cap" style="position:absolute;left:90px;top:18px;text-align:left;line-height:15px"><span data-t="АЗ-5">АЗ-5</span><br><span data-t="ПОДНЯТЬ КРЫШКУ<br>И НАЖАТЬ" style="color:#8f9294;font-size:10px;letter-spacing:1px">ПОДНЯТЬ КРЫШКУ<br>И НАЖАТЬ</span></div>
+   <div class="tog" id="tProt" data-act="prot" style="left:210px;top:6px"><div class="base"></div><div class="lev"></div></div>
+   <div class="cap" style="position:absolute;left:256px;top:8px;text-align:left;line-height:14px"><span data-t="ВКЛ">ВКЛ</span><br><span data-t="ЗАЩИТЫ" style="color:#8f9294">ЗАЩИТЫ</span><br><span data-t="ОТКЛ">ОТКЛ</span></div>
+  </div>
+ </div>
+ <canvas id="fx" style="width:1100px;height:540px"></canvas>
+ <div id="cap" class="hidden"><div id="capT"></div><div id="capX"></div><div id="capB"><button class="pb" data-act="rp_pause" id="bRpP">II</button><button class="pb sel" data-act="rp_next" id="bRpN">▶▶</button><button class="pb" data-act="rp_exit">✕</button></div></div>
+ <div id="ov"></div>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+function hash(n){n=(n|0)^0x9e3779b9;n=Math.imul(n^(n>>>16),0x85ebca6b);n=Math.imul(n^(n>>>13),0xc2b2ae35);n^=n>>>16;return (n>>>0)/4294967296;}
+
+/* ===================== ЯЗЫК / JĘZYK ===================== */
+let LANG='ru';try{LANG=localStorage.getItem('rbmk_lang')||'';}catch(e){}
+const PL={
+ 'РБМК-1000':'RBMK-1000','БЩУ · ПУЛЬТ СИУР':'NASTAWNIA BLOKU','ВРЕМЯ':'CZAS','СМЕНА':'ZMIANA',
+ 'ЗВУК':'DŹWIĘK','ТИХО':'CISZA','ПАУЗА':'PAUZA',
+ 'КАРТОГРАММА А.З.':'KARTOGRAM RDZENIA','ЭВМ «СКАЛА» · ЖУРНАЛ':'KOMPUTER „SKAŁA” · DZIENNIK','КОНТРОЛЬ':'POMIARY','ПОКАЗАТЕЛИ':'WSKAŹNIKI',
+ 'СИГНАЛИЗАЦИЯ':'SYGNALIZACJA','СУЗ · ПОЛОЖЕНИЕ СТЕРЖНЕЙ':'SUZ · POŁOŻENIE PRĘTÓW','ГЦН · НАСОСЫ':'POMPY OBIEGOWE','АВАРИЙНАЯ ЗАЩИТА':'OCHRONA AWARYJNA',
+ 'ОЗР, СТ.':'OZR, PR.','ЗАДАТЧИК АР':'ZADAJNIK AR','ПЕРИОД, С':'OKRES, S','КВИТ':'POTW.','АВТ':'AUTO','ВЗВОД':'UZBRÓJ',
+ 'АЗ-5':'AZ-5','ПОДНЯТЬ КРЫШКУ<br>И НАЖАТЬ':'PODNIEŚ OSŁONĘ<br>I NACIŚNIJ','ВКЛ':'WŁ.','ЗАЩИТЫ':'ZABEZP.','ОТКЛ':'WYŁ.',
+ 'ПРЕВЫШ.<br>МОЩН.':'ZA DUŻA<br>MOC','ПЕРИОД<br>< 20 С':'OKRES<br>< 20 S','ОЗР<br>< 15':'OZR<br>< 15','МОЩН.<br>< 700':'MOC<br>< 700',
+ 'ГЦН<br>ОТКЛ':'POMPA<br>AWARIA','АР<br>ПРЕДЕЛ':'AR<br>KRANIEC','ЗАЩИТЫ<br>ОТКЛ':'ZABEZP.<br>WYŁ.',
+ 'РР':'RR','АР':'AR','УСП':'USP','АЗ':'AZ','СКАЛА':'SKAŁA','ЗАЕД.':'ZACIĘTY','ОТКАЗ':'AWARIA',' м':' m',
+ 'МОЩНОСТЬ':'MOC','МВт ×1000':'MW ×1000','РЕАКТИВН.':'REAKTYWN.','β (эфф.)':'β (efekt.)','РАСХОД КМПЦ':'PRZEPŁYW','×1000 м³/ч':'×1000 m³/h',
+ 'ПАРОСОДЕРЖ.':'ZAWART. PARY','% объёмн.':'% objęt.',
+ 'ДАТА':'DATA','ИЗГОТОВИТЕЛЬ':'WYKONANIE','ТЕСТ':'TEST','ЗАШКАЛ':'POZA SK.','ПЛАН':'PLAN','МВт':'MW','ВЫР':'PROD','МВт·ч':'MWh','↑ЯМА':'↑JAMA','ВЫГОВОРЫ':'NAGANY','ТВЭЛ':'PALIWO'
+};
+const t=ru=>LANG==='pl'&&PL[ru]!==undefined?PL[ru]:ru;
+const TRX=[
+ [/ПУСК ГЦН-7, ГЦН-8/g,'ROZRUCH POMP 7 I 8'],
+ [/ГЦН-(\d) В РАБОТЕ/g,'POMPA $1 PRACUJE'],[/ОТКЛЮЧЕНИЕ ГЦН-(\d)!/g,'AWARIA POMPY $1!'],[/ГЦН-(\d) ОСТАНОВЛЕН/g,'POMPA $1 ZATRZYMANA'],[/ПУСК ГЦН-(\d)/g,'ROZRUCH POMPY $1'],
+ [/ДИСП: В (\S+) →/g,'DYSP: O $1 →'],[/СМЕНА (\d+) ПРИНЯТА/g,'ZMIANA $1 PRZEJĘTA'],[/АР В АВТОМАТ, ЗАД\./g,'AR AUTO, ZADANE'],
+ [/АЗМ: ПРЕВЫШЕНИЕ МОЩНОСТИ/g,'AZM: ZA DUŻA MOC'],[/АЗС: МАЛЫЙ ПЕРИОД/g,'AZS: ZA KRÓTKI OKRES'],[/АЗ ГЦН: МАЛЫЙ РАСХОД/g,'AZ: MAŁY PRZEPŁYW'],
+ [/КНОПКА АЗ-5 \(ОПЕРАТОР\)/g,'PRZYCISK AZ-5'],[/НЕВЫПОЛНЕНИЕ ГРАФИКА/g,'NIEWYKONANIE PLANU'],[/ОЗР < 15 СТ\. \(РЕГЛАМЕНТ\)/g,'OZR < 15 PR. (REGULAMIN)'],
+ [/МОЩНОСТЬ < 700/g,'MOC < 700'],[/ЗАЩИТЫ ВЫВЕДЕНЫ/g,'ZABEZPIECZENIA WYŁĄCZONE'],[/ЗАЩИТЫ ВВЕДЕНЫ/g,'ZABEZPIECZENIA WŁĄCZONE'],
+ [/АР ИСПРАВЕН/g,'AR SPRAWNY'],[/АР НЕИСПРАВЕН/g,'AR NIESPRAWNY'],[/АР ОТКЛЮЧЕН/g,'AR WYŁĄCZONY'],[/ОТКАЗ АР — РУЧНОЕ УПР\./g,'AWARIA AR — STER. RĘCZNE'],
+ [/ЗАЕДАНИЕ ПРИВОДА РР \(25 С\)/g,'ZACIĘCIE NAPĘDU RR (25 S)'],[/СМЕНА ПРИНЯТА\./g,'ZMIANA PRZEJĘTA.'],[/ДЕРЖАТЬ/g,'TRZYMAĆ'],[/СРОЧНО/g,'PILNIE'],
+ [/АЗ НЕ СРАБАТЫВАЛА/g,'AZ NIE ZADZIAŁAŁA'],[/ВЗВОД ЗАПРЕЩЁН/g,'UZBROJENIE ZABRONIONE'],[/ВЗВОД АЗ\. СТЕРЖНИ АЗ ВВЕРХ/g,'UZBROJENIE AZ. PRĘTY AZ W GÓRĘ'],
+ [/СНИЖЕНИЕ МОЩНОСТИ/g,'OBNIŻANIE MOCY'],[/ТГ-7 ОТКЛЮЧЕН/g,'TG-7 ODŁĄCZONY'],[/САОР ОТКЛЮЧЕНА/g,'SAOR (ECCS) ODŁĄCZONY'],[/КИЕВЭНЕРГО: ЗАДЕРЖАТЬ ИСПЫТАНИЕ/g,'KIJOWENERGO: WSTRZYMAĆ TEST'],
+ [/СНИЖЕНИЕ ПРОДОЛЖЕНО/g,'OBNIŻANIE WZNOWIONE'],[/СМЕНУ ПРИНЯЛ АКИМОВ/g,'ZMIANĘ PRZEJĄŁ AKIMOW'],[/ПРОВАЛ МОЩНОСТИ ДО 30/g,'SPADEK MOCY DO 30'],[/ПОДЪЁМ МОЩНОСТИ/g,'PODNOSZENIE MOCY'],
+ [/СКАЛА: ОЗР = 8 СТ\./g,'SKAŁA: OZR = 8 PR.'],[/ЗАЩИТА ПО ОСТАНОВУ ТГ ЗАБЛОКИРОВАНА/g,'ZABEZP. OD WYŁ. TURBINY ZABLOK.'],
+ [/ИСПЫТАНИЕ: СК ТГ-8 ЗАКРЫТ, ВЫБЕГ/g,'TEST: ZAWORY TG-8 ZAMKN., WYBIEG'],[/АКИМОВ: ГЛУШИ РЕАКТОР!/g,'AKIMOW: GAŚ REAKTOR!'],[/СТЕРЖНИ АЗ ОСТАНОВИЛИСЬ!/g,'PRĘTY AZ STANĘŁY!'],
+ [/АЗМ · АЗС · ПЕРИОД < 10 С/g,'AZM · AZS · OKRES < 10 S'],[/ВЗРЫВ/g,'WYBUCH'],[/НЕТ СВЯЗИ/g,'BRAK ŁĄCZNOŚCI'],[/ИСПЫТАНИЕ/g,'TEST'],
+ [/ВЫГОВОР:/g,'NAGANA:'],[/ГЦН-(\d)/g,'POMPA $1'],[/ДИСП:/g,'DYSP:'],[/ПЛАН/g,'PLAN'],[/МВт/g,'MW'],[/АЗ-5/g,'AZ-5']
+];
+const LAT=[['МОЩНОСТЬ','MOC'],['СКАЛА','SKAŁA'],['СИУР','operator reaktora'],['САОР','SAOR'],['ГЦН','GCN'],['ОЗР','OZR'],['АЗ‑5','AZ‑5'],['АЗ-5','AZ-5'],['АЗМ','AZM'],['АЗС','AZS'],['УСП','USP'],['РР','RR'],['АР','AR'],['АЗ','AZ']];
+function lat(m){if(LANG!=='pl')return m;for(const [a,b] of LAT)m=m.split(a).join(b);return m;}
+function tr(m){if(LANG!=='pl')return m;for(const [re,r] of TRX)m=m.replace(re,r);return m;}
+function applyLang(){
+  document.documentElement.lang=LANG==='pl'?'pl':'ru';
+  document.title=LANG==='pl'?'RBMK-1000 · Nastawnia':'РБМК-1000 · БЩУ';
+  document.querySelectorAll('[data-t]').forEach(el=>{el.innerHTML=t(el.dataset.t);});
+  LAMPS.forEach(l=>{lampEl[l[0]].innerHTML=t(l[1]);});
+  $('bSnd').textContent=t(muted?'ТИХО':'ЗВУК');
+  for(const k in drumCache)delete drumCache[k];vfd.last='';
+}
+function autoTag(){
+  document.querySelectorAll('.lbl,.cap,.pb,.lb,#hdr .title,#hdr .sub').forEach(el=>{
+    if(el.dataset.t||el.id==='bSnd')return;const h=el.innerHTML.trim();if(!h||/<(?!br>)/.test(h))return;el.dataset.t=h;});
+}
+const stage=$('stage');let SCALE=1,DPR=1;
+const CANV={};let OX=0,OY=0;
+function applyShake(a){const dx=a?(Math.random()*2-1)*a:0,dy=a?(Math.random()*2-1)*a:0;stage.style.transform=`translate(${OX+dx}px,${OY+dy}px) scale(${SCALE})`;}
+function fit(){
+  const SH=stage.classList.contains('rp')?618:540;stage.style.height=SH+'px';
+  SCALE=Math.min(innerWidth/1100,innerHeight/SH);DPR=window.devicePixelRatio||1;
+  OX=(innerWidth-1100*SCALE)/2;OY=(innerHeight-SH*SCALE)/2;applyShake(0);
+  for(const id of ['cmap','gPow','gRho','gFlow','gVoid','rods','fx']){
+    const c=$(id),w=parseFloat(c.style.width),h=parseFloat(c.style.height),k=Math.min(3,Math.max(1,SCALE*DPR));
+    c.width=Math.round(w*k);c.height=Math.round(h*k);const x=c.getContext('2d');x.setTransform(k,0,0,k,0,0);CANV[id]={c,x,w,h};
+  }
+}
+window.addEventListener('resize',fit);
+
+/* ===================== PHYSICS ===================== */
+const NOM=3200;                       // МВт(т)
+const RW={RR:6,AR:1.5,USP:2,AZ:8};    // вес групп, β
+const CV=2.5, CD=1.5, CX=4.5, TK=10;   // паровой, доплер, ксенон, постоянная кинетики
+const voidFn=(n,F)=>clamp(0.6*Math.sqrt(Math.max(n,0)/Math.max(F,0.05)),0,1);
+const V0=voidFn(1,1);
+let S,K0=0;
+function ozr(){return (S.rods.RR*RW.RR+S.rods.AR*RW.AR+S.rods.USP*RW.USP)/0.25;}
+function bump(x){return x<=0?0:x<0.18?Math.pow(x/0.18,1.6):x<0.4?(0.4-x)/0.22:0;}
+let BK=0.28;
+function rodRho(){
+  const B=(S.scram&&S.Bfix!=null)?S.Bfix:0.05+BK*clamp((15-ozr())/12,0,1)*(1+0.8*clamp(S.X-1,0,1));
+  let r=0;for(const k in RW){const x=S.rods[k];r+=-RW[k]*x+(k==='USP'?0:B*RW[k]*bump(x));}
+  return r;
+}
+function newState(){
+  S={coastF:1,stuck:false,chern:false,cine:null,n:1,C:1,Tf:1,void:V0,F:1,I:1,X:1,rods:{RR:0.8,AR:0.5,USP:0.5,AZ:0},
+     pumps:[1,1,1,1,1,1,0,0],pumpT:[0,0,0,0,0,0,0,0],
+     arAuto:true,arSet:3200,arFail:0,jam:0,scram:false,scramT:-99,scramOzr:99,azReset:false,prot:true,
+     tmin:6*60,tacc:0,shift:1,shiftStart:6*60,plan:3200,nextPlan:null,nextPlanAt:6*60+70,announced:false,planChangedAt:-999,
+     nextEventAt:6*60+45,energy:0,shiftEnergy:0,planOk:0,planTot:0,reps:0,repList:[],devMin:0,ozrMin:0,lowMin:0,protMin:0,
+     damage:0,rho:0,rate:0,period:Infinity,tilt:{x:0,y:0,tx:0,ty:0},t:0,over:false,dead:false,reason:''};
+  K0=-rodRho();
+}
+// Состояние блока 4 ЧАЭС ~01:23:04 26.04.1986 (упрощённо)
+function loadChernobylState(){
+  S.n=0.0625;S.C=S.n;S.Tf=S.n;S.F=8/6;S.void=voidFn(S.n,S.F);S.I=0.35;S.X=1.65;
+  S.rods={RR:0,AR:0.5,USP:0.5,AZ:0};S.pumps=[1,1,1,1,1,1,1,1];S.coastF=1;
+  S.arAuto=true;S.arSet=200;S.arFail=0;S.prot=false;S.scram=false;S.stuck=false;S.chern=true;S.azReset=false;
+  K0=0;K0=-(rodRho()+CV*(S.void-V0)-CD*(S.Tf-1)-CX*(S.X-1));
+}
+function startTest(){for(let i=0;i<4;i++)S.pumps[i]=4;S.coastF=1;S.testOn=true;log('ИСПЫТАНИЕ: СК ТГ-8 ЗАКРЫТ, ВЫБЕГ','hot');}
+const hold={RRup:0,RRdn:0,USPup:0,USPdn:0};
+let rodsMoving=0;
+function moveRods(dt){
+  const R=S.rods;rodsMoving=0;
+  if(S.scram){if(S.stuck)return;for(const k in R){if(R[k]<1){R[k]=Math.min(1,R[k]+0.06*dt);rodsMoving=1;}}return;}
+  if(S.azReset){R.AZ=Math.max(0,R.AZ-0.035*dt);rodsMoving=1;if(R.AZ<=0)S.azReset=false;}
+  const sp=0.04*dt;
+  if(S.jam<=0){if(hold.RRup&&R.RR>0){R.RR-=sp;rodsMoving=1;}if(hold.RRdn&&R.RR<1){R.RR+=sp;rodsMoving=1;}}
+  if(hold.USPup&&R.USP<1){R.USP+=sp;rodsMoving=1;}if(hold.USPdn&&R.USP>0){R.USP-=sp;rodsMoving=1;}
+  if(S.arAuto&&S.arFail<=0){
+    const e=S.arSet/NOM-S.n,d=S.n*S.rate;
+    const u=clamp(-0.9*e+5*d,-0.05,0.05);
+    const old=R.AR;R.AR=clamp(R.AR+u*dt,0,1);if(Math.abs(R.AR-old)>1e-5)rodsMoving=Math.max(rodsMoving,0.5);
+  }
+  for(const k in R)R[k]=clamp(R[k],0,1);
+}
+function physStep(dt,dm){
+  for(let i=0;i<8;i++)if(S.pumps[i]===3){S.pumpT[i]-=dt;if(S.pumpT[i]<=0){S.pumps[i]=1;log('ГЦН-'+(i+1)+' В РАБОТЕ');}}
+  const running=S.pumps.reduce((a,p)=>a+(p===1?1:p===4?S.coastF:0),0);
+  if(S.pumps.includes(4))S.coastF=Math.max(0.55,S.coastF-dt*0.01);
+  S.F+=(running/6-S.F)*(1-Math.exp(-dt/3));
+  moveRods(dt);
+  S.void+=(voidFn(S.n,S.F)-S.void)*(1-Math.exp(-dt/1.0));
+  S.Tf+=(S.n-S.Tf)*(1-Math.exp(-dt/3));
+  const L=1/792;
+  S.I+=1.39*L*(S.n-S.I)*dm;
+  S.X+=L*(5.8*S.I+0.2*S.n-(1+5*S.n)*S.X)*dm;
+  S.rho=K0+rodRho()+CV*(S.void-V0)-CD*(S.Tf-1)-CX*(S.X-1);
+  // точечная кинетика, 1 группа запаздывающих, приближение мгновенного скачка
+  const r=S.rho,den=Math.max(0.05,1-r);
+  let rate=r/(TK*den);if(r>0.95)rate+=(r-0.95)*40;
+  const n0=S.n;
+  S.C=Math.min(5,Math.max(1e-7,S.C*Math.exp(rate*dt)+1e-7*dt));
+  S.n=S.C/den;
+  S.rate=rate;
+  S.period=Math.abs(rate)>1e-4?1/rate:Infinity;
+  // tilt (азимутальная неравномерность)
+  const amp=0.04+0.3*clamp((20-ozr())/20,0,1)+0.08*clamp(S.X-1,0,1);
+  S.tilt.t=(S.tilt.t||0)-dt;if(S.tilt.t<=0){S.tilt.t=4+Math.random()*6;S.tilt.tx=(Math.random()*2-1)*amp;S.tilt.ty=(Math.random()*2-1)*amp;}
+  S.tilt.x+=(S.tilt.tx-S.tilt.x)*dt*0.3;S.tilt.y+=(S.tilt.ty-S.tilt.y)*dt*0.3;
+  // повреждения
+  if(S.Tf>1.25)S.damage+=(S.Tf-1.25)*0.35*dt;
+  if(S.F<0.3&&S.n>0.15)S.damage+=S.n*0.25*dt;
+  if(S.scram&&!S.stuck&&S.n>2){S.stuck=true;log('СТЕРЖНИ АЗ ОСТАНОВИЛИСЬ!','hot');}
+  if(S.n>3.5)return explode();
+  if(S.damage>=1)return melt();
+  // защиты
+  if(S.prot&&!S.scram){
+    if(S.n>1.10)scram('АЗМ: ПРЕВЫШЕНИЕ МОЩНОСТИ');
+    else if(S.period>0&&S.period<15&&S.n>0.01)scram('АЗС: МАЛЫЙ ПЕРИОД');
+    else if(S.F<0.55&&S.n>0.5)scram('АЗ ГЦН: МАЛЫЙ РАСХОД');
+  }
+}
+function scram(why){
+  if(S.scram)return;S.Bfix=0.05+BK*clamp((15-ozr())/12,0,1)*(1+0.8*clamp(S.X-1,0,1));S.scram=true;S.azReset=false;S.scramT=S.t;S.scramOzr=Math.round(ozr());
+  log('!!! АЗ-5 · '+why,'hot');setSpeed(1);snd.klaxon();
+}
+
+/* ===================== GAME LOGIC ===================== */
+const PLAN_VALUES=[[3200,2800,2400,2000,1600],[3200,2400,1600,1200,1000],[3200,2400,1600,1000,700]];
+function hhmmss(m){const s=Math.floor(((m%1440)+1440)%1440*60+1e-6);return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function hhmm(m){m=((Math.floor(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+const LOG=[];
+function log(msg,cls){LOG.unshift({t:hhmm(S.tmin),msg,cls:cls||''});if(LOG.length>12)LOG.pop();}
+function reprimand(why){
+  S.reps++;S.repList.push(why);log('ВЫГОВОР: '+why,'hot');snd.buzz();setSpeed(1);
+  if(S.reps>=3)gameOver('fired');
+}
+function minuteTick(){
+  S.tmin+=1;
+  const P=S.n*NOM,mwh=P*(S.n>0.22?0.31:0.22)/60;
+  S.energy+=mwh;S.shiftEnergy+=mwh;
+  if(S.scen||S.egg)return scenMinute();
+  const grace=S.tmin-S.planChangedAt<40;
+  if(!grace){S.planTot++;if(Math.abs(P-S.plan)>0.07*NOM)S.devMin++;else{S.planOk++;S.devMin=Math.max(0,S.devMin-0.5);}}
+  if(S.devMin>=30){S.devMin=0;reprimand('НЕВЫПОЛНЕНИЕ ГРАФИКА');}
+  const z=ozr();
+  if(z<15&&S.n>0.02)S.ozrMin++;else S.ozrMin=Math.max(0,S.ozrMin-1);
+  if(S.ozrMin>=20){S.ozrMin=0;reprimand('ОЗР < 15 СТ. (РЕГЛАМЕНТ)');}
+  if(S.n>0.02&&S.n<0.21)S.lowMin++;else S.lowMin=Math.max(0,S.lowMin-1);
+  if(S.lowMin>=20){S.lowMin=0;reprimand('МОЩНОСТЬ < 700 МВт');}
+  if(!S.prot)S.protMin++;else S.protMin=0;
+  if(S.protMin>=10){S.protMin=-20;reprimand('ЗАЩИТЫ ВЫВЕДЕНЫ');}
+  if(S.arFail>0){S.arFail--;if(S.arFail===0)log('АР ИСПРАВЕН');}
+  // план
+  if(!S.announced&&S.tmin>=S.nextPlanAt-20){
+    const vals=PLAN_VALUES[Math.min(S.shift-1,2)].filter(v=>v!==S.plan);
+    S.nextPlan=vals[Math.floor(Math.random()*vals.length)];S.announced=true;
+    log('ДИСП: В '+hhmm(S.nextPlanAt)+' → '+S.nextPlan+' МВт');snd.chime();
+  }
+  if(S.announced&&S.tmin>=S.nextPlanAt){
+    S.plan=S.nextPlan;S.planChangedAt=S.tmin;S.announced=false;S.nextPlan=null;
+    S.nextPlanAt=S.tmin+70+Math.floor(Math.random()*90);
+    log('ДИСП: ПЛАН '+S.plan+' МВт','hot');snd.chime();
+  }
+  // события
+  if(S.tmin>=S.nextEventAt){
+    S.nextEventAt=S.tmin+Math.max(25,60+Math.floor(Math.random()*90)-S.shift*10);
+    const r=Math.random(),run=S.pumps.map((p,i)=>p===1?i:-1).filter(i=>i>=0);
+    if(r<0.4&&run.length){const i=run[Math.floor(Math.random()*run.length)];S.pumps[i]=2;log('ОТКЛЮЧЕНИЕ ГЦН-'+(i+1)+'!','hot');snd.buzz();setSpeed(1);}
+    else if(r<0.62){S.arFail=30;log('ОТКАЗ АР — РУЧНОЕ УПР.','hot');snd.buzz();setSpeed(1);}
+    else if(r<0.78){S.jam=25;log('ЗАЕДАНИЕ ПРИВОДА РР (25 С)','hot');snd.buzz();setSpeed(1);}
+    else{const vals=[2400,1600,2000].filter(v=>v!==S.plan);S.plan=vals[Math.floor(Math.random()*vals.length)];S.planChangedAt=S.tmin-15;log('ДИСП: СРОЧНО '+S.plan+' МВт!','hot');snd.chime();setSpeed(1);}
+  }
+  if(S.tmin-S.shiftStart>=480)shiftEnd();
+}
+
+/* ===================== UI: lamps / pumps ===================== */
+const LAMPS=[['az','АЗ-5','r'],['azm','ПРЕВЫШ.<br>МОЩН.','r'],['per','ПЕРИОД<br>< 20 С','a'],['ozr','ОЗР<br>< 15','a'],
+             ['low','МОЩН.<br>< 700','a'],['gcn','ГЦН<br>ОТКЛ','r'],['ar','АР<br>ПРЕДЕЛ','a'],['prot','ЗАЩИТЫ<br>ОТКЛ','r']];
+const lampEl={},lampState={},lampAck={};
+LAMPS.forEach((l,i)=>{const d=document.createElement('div');d.className='lamp '+l[2];d.innerHTML=l[1];d.style.left=(10+(i%4)*70)+'px';d.style.top=(12+Math.floor(i/4)*31)+'px';$('lamps').appendChild(d);lampEl[l[0]]=d;lampState[l[0]]=false;lampAck[l[0]]=true;});
+let alarmPending=false;
+function updLamps(){
+  const z=ozr(),c={
+    az:S.scram,azm:S.n>1.05,per:S.period>0&&S.period<20&&S.n>0.005,ozr:z<15&&S.n>0.02,low:S.n>0.02&&S.n<0.21,
+    gcn:S.pumps.includes(2),ar:S.arFail>0||(S.arAuto&&(S.rods.AR<0.03||S.rods.AR>0.97)),prot:!S.prot};
+  alarmPending=false;
+  if(CINE&&game!=='play'){for(const k in lampEl){const d=CINE.dead.has(k);lampEl[k].classList.toggle('on',!d);lampEl[k].classList.toggle('blink',!d&&!CINE.e2);if(CINE.e2&&!d)lampEl[k].style.opacity=Math.random()<0.15?0.2:1;}$('bKvit').classList.add('on','blink');return;}
+  for(const k in lampEl)lampEl[k].style.opacity='';
+  for(const k in c){
+    if(c[k]&&!lampState[k]){lampAck[k]=false;}
+    lampState[k]=c[k];
+    const el=lampEl[k];el.classList.toggle('on',c[k]);
+    const fl=c[k]&&!lampAck[k];el.classList.toggle('blink',fl);if(fl)alarmPending=true;
+  }
+  $('bKvit').classList.toggle('on',alarmPending);$('bKvit').classList.toggle('blink',alarmPending);
+}
+const pumpEl=[];
+for(let i=0;i<8;i++){const b=document.createElement('button');b.className='lb g';b.style.cssText=`position:absolute;left:${12+i*43}px;top:14px;width:37px;height:40px;font-size:16px;letter-spacing:0`;b.textContent=i+1;b.dataset.act='pump'+i;$('pumps').appendChild(b);pumpEl.push(b);}
+function updPumps(){
+  for(let i=0;i<8;i++){const p=S.pumps[i],b=pumpEl[i];
+    b.className='lb '+(p===2?'r on blink':p===3?'a on blink':p===4?'a on':p===1?'g on':'g');}
+  $('bAR').className='lb '+(S.arFail>0?'r on blink':S.arAuto?'g on':'g');
+  $('bVzv').className='lb a'+(S.scram&&S.n<0.02?' on blink':S.azReset?' on':'');
+  $('tProt').classList.toggle('off',!S.prot);
+}
+const drumCache={};
+function setDrum(id,str,cls){
+  if(drumCache[id]===str)return;drumCache[id]=str;const el=$(id);if(cls)el.classList.add(cls);
+  el.innerHTML=[...str].map(ch=>ch===':'||ch==='.'?`<span class="sep">${ch}</span>`:`<span>${ch}</span>`).join('');
+}
+
+/* ===================== DRAWING ===================== */
+function face(x,cx,cy,r){
+  const g=x.createRadialGradient(cx-r*.3,cy-r*.3,r*.1,cx,cy,r*1.15);g.addColorStop(0,'#c4c6c4');g.addColorStop(1,'#3a3c3d');
+  x.fillStyle=g;x.beginPath();x.arc(cx,cy,r*1.07,0,7);x.fill();
+  x.fillStyle='#0b0c0d';x.beginPath();x.arc(cx,cy,r,0,7);x.fill();
+}
+function bezel(x,w,h){
+  const s=Math.min(w,h)-6,bx=(w-s)/2,by=(h-s)/2;
+  x.fillStyle='#232425';x.beginPath();x.roundRect?x.roundRect(bx,by,s,s,10):x.rect(bx,by,s,s);x.fill();
+  x.strokeStyle='#0b0c0d';x.lineWidth=2;x.stroke();
+  for(const [a,b] of [[bx+9,by+9],[bx+s-9,by+9],[bx+9,by+s-9],[bx+s-9,by+s-9]]){
+    const g=x.createRadialGradient(a-1.5,b-1.5,0.5,a,b,5);g.addColorStop(0,'#ffe08a');g.addColorStop(.6,'#b08a2a');g.addColorStop(1,'#5a4410');
+    x.fillStyle=g;x.beginPath();x.arc(a,b,4.5,0,7);x.fill();x.strokeStyle='#3a2a08';x.lineWidth=1.2;x.beginPath();x.moveTo(a-3,b+1);x.lineTo(a+3,b-1);x.stroke();}
+}
+function T(x,s,px,py,size,col,al,wt){x.font=(wt||700)+' '+size+'px "Roboto Condensed","Arial Narrow",sans-serif';x.textAlign=al||'center';x.textBaseline='middle';x.fillStyle=col;x.fillText(s,px,py);}
+function needle(x,cx,cy,a,len,w,col){x.save();x.translate(cx,cy);x.rotate(a);x.fillStyle=col;x.beginPath();x.moveTo(-len*.18,-w);x.lineTo(len,0);x.lineTo(-len*.18,w);x.closePath();x.fill();x.restore();
+  x.fillStyle='#2c2e30';x.beginPath();x.arc(cx,cy,w*1.6,0,7);x.fill();x.fillStyle='#7a7d7f';x.beginPath();x.arc(cx,cy,w*.7,0,7);x.fill();}
+function gauge(id,o){
+  const {x,w,h}=CANV[id];x.clearRect(0,0,w,h);bezel(x,w,h);
+  const cx=w/2,cy=h/2+2,r=Math.min(w,h)/2-13;face(x,cx,cy,r);
+  const a0=o.a0??(5/6)*Math.PI,sw=o.sw??(4/3)*Math.PI,f=v=>clamp((v-o.min)/(o.max-o.min),0,1),ang=v=>a0+sw*f(v);
+  for(const z of o.zones||[]){x.strokeStyle=z[2];x.lineWidth=r*.09;x.beginPath();x.arc(cx,cy,r*.86,ang(z[0]),ang(z[1]));x.stroke();}
+  x.strokeStyle='#e6e3d6';
+  const nT=Math.round((o.max-o.min)/o.minor);
+  for(let k=0;k<=nT;k++){const v=o.min+k*o.minor,a=ang(v),mj=Math.abs((v-o.min)/o.major-Math.round((v-o.min)/o.major))<1e-6;
+    x.lineWidth=mj?2:1;x.beginPath();x.moveTo(cx+Math.cos(a)*r*(mj?.72:.8),cy+Math.sin(a)*r*(mj?.72:.8));x.lineTo(cx+Math.cos(a)*r*.93,cy+Math.sin(a)*r*.93);x.stroke();
+    if(mj)T(x,o.fmt?o.fmt(v):String(v),cx+Math.cos(a)*r*.56,cy+Math.sin(a)*r*.56,r*.18,'#e6e3d6');}
+  for(const m of o.marks||[]){const a=ang(m[0]);x.save();x.translate(cx+Math.cos(a)*r*.97,cy+Math.sin(a)*r*.97);x.rotate(a);x.fillStyle=m[1];x.beginPath();x.moveTo(-r*.13,0);x.lineTo(0,-r*.07);x.lineTo(0,r*.07);x.closePath();x.fill();x.restore();}
+  T(x,t(o.label),cx,cy+r*.7,r*.14,'#b6b8b7');
+  if(o.unit)T(x,t(o.unit),cx,cy-r*.3,r*.11,'#7a7d7f');
+  if(o.read!=null){x.fillStyle='#050505';const rw=r*.7,rh=r*.24;x.fillRect(cx-rw/2,cy+r*.42-rh/2,rw,rh);x.strokeStyle='#2c2e30';x.lineWidth=1;x.strokeRect(cx-rw/2,cy+r*.42-rh/2,rw,rh);
+    x.font='700 '+(r*.2)+'px "Roboto Mono",monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle=o.readCol||'#e6e3d6';x.fillText(o.read,cx,cy+r*.43);}
+  needle(x,cx,cy,ang(o.v),r*.84,r*.05,'#f2f0e6');
+}
+/* картограмма */
+const CELLS=[];(function(){const N=26,R=12.6;for(let i=0;i<N;i++)for(let j=0;j<N;j++){const dx=i-(N-1)/2,dy=j-(N-1)/2,rr=Math.hypot(dx,dy);if(rr>R)continue;
+  const isRod=(i%3===1&&j%3===1);let g=null;if(isRod){const h=hash(i*97+j*13);g=rr<2.2?'AR':h<0.13?'USP':h<0.27?'AZ':'RR';}
+  CELLS.push({i,j,x:dx/R,y:dy/R,r:rr/R,g});}
+ for(const c of CELLS){if(c.g)continue;let best=null,bd=9;for(const d of CELLS){if(!d.g)continue;const dd=Math.hypot(c.i-d.i,c.j-d.j);if(dd<bd){bd=dd;best=d;}}c.near=best.g;}
+})();
+const GCOL={RR:[230,227,214],AR:[110,230,150],USP:[240,168,30],AZ:[240,70,40]};
+function heat(v){ // v ~ относительная мощность канала
+  const stops=[[0,[16,26,32]],[0.25,[20,70,40]],[0.7,[60,170,70]],[1.0,[170,215,60]],[1.25,[245,200,40]],[1.5,[245,90,30]],[2.2,[255,255,255]]];
+  for(let k=1;k<stops.length;k++){if(v<=stops[k][0]){const a=stops[k-1],b=stops[k],t=(v-a[0])/(b[0]-a[0]);return `rgb(${a[1].map((c,q)=>Math.round(c+(b[1][q]-c)*t)).join(',')})`;}}
+  return 'rgb(255,255,255)';
+}
+function drawMap(){
+  const {x,w,h}=CANV.cmap;x.clearRect(0,0,w,h);
+  x.fillStyle='#0b0c0d';x.beginPath();x.arc(w/2,h/2,w/2-1,0,7);x.fill();
+  const cs=w/26.6,R=S.rods;
+  let vals=[],sum=0;
+  const ch=S.scram&&S.Bfix>0.1?clamp((S.n-0.08)*1.5,0,1.4):0;
+  for(const c of CELLS){if(c.g)continue;let f=(1-0.62*c.r*c.r)*(1+S.tilt.x*c.x+S.tilt.y*c.y)*(1-0.15*R[c.near])*(1+ch*(c.y+0.25)*1.6+ch*0.8*Math.exp(-((c.x+0.25)**2+(c.y-0.35)**2)*8)+ch*0.7*Math.exp(-((c.x-0.3)**2+(c.y-0.45)**2)*9));vals.push(Math.max(0.05,f));sum+=Math.max(0.05,f);}
+  const avg=sum/vals.length;let k=0;
+  for(const c of CELLS){
+    const px=w/2+c.x*12.6*cs-cs/2,py=h/2+c.y*12.6*cs-cs/2;
+    if(c.g){const ins=R[c.g],col=GCOL[c.g];x.fillStyle='#050505';x.fillRect(px,py,cs-1,cs-1);
+      x.fillStyle=`rgba(${col.join(',')},${0.18+0.82*ins})`;x.beginPath();x.arc(px+cs/2-.5,py+cs/2-.5,cs*0.36,0,7);x.fill();}
+    else{let v=(S.n<1?Math.pow(S.n,0.3):S.n)*vals[k++]/avg;
+      if(CINE){const sp=CINE.t*0.9,d=Math.min(Math.hypot(c.x+0.25,c.y-0.35),Math.hypot(c.x-0.3,c.y-0.45));
+        v=d<sp?2.2+Math.random()*0.3:Math.min(v,1.45)+Math.random()*0.2;
+        if(CINE.e1){const key=c.i*100+c.j;if(!CINE.blown.has(key)&&Math.random()<0.004*(CINE.e2?3:1))CINE.blown.add(key);if(CINE.blown.has(key)){x.fillStyle=Math.random()<0.1?'#fff':'#050505';x.fillRect(px,py,cs-1,cs-1);continue;}}}
+      x.fillStyle=heat(v);x.fillRect(px,py,cs-1,cs-1);}
+  }
+  x.font='700 9px "Roboto Condensed",sans-serif';x.textAlign='left';x.textBaseline='middle';
+  [['РР','RR'],['АР','AR'],['УСП','USP'],['АЗ','AZ']].forEach((g,i)=>{const col=GCOL[g[1]];x.fillStyle=`rgb(${col})`;x.beginPath();x.arc(4+i*0,h-8-i*11,3.2,0,7);x.fill();x.fillStyle='#9a9c9a';x.fillText(t(g[0]),10,h-8-i*11);});
+  x.textAlign='right';x.fillStyle='#9a9c9a';x.fillText(t('СКАЛА'),w-2,8);
+}
+function drawRods(){
+  const {x,w,h}=CANV.rods;x.clearRect(0,0,w,h);
+  const groups=[['РР','RR'],['АР','AR'],['УСП','USP'],['АЗ','AZ']],cw=w/4,top=26,bh=158;
+  groups.forEach((g,i)=>{
+    const cx=i*cw+cw/2,ins=S.rods[g[1]],col=`rgb(${GCOL[g[1]]})`;
+    T(x,t(g[0]),cx,10,14,'#e6e3d6');
+    x.fillStyle='#0b0c0d';x.fillRect(cx-12,top-3,24,bh+6);
+    x.fillStyle='#050505';x.fillRect(cx-9,top,18,bh);
+    const fromBottom=g[1]==='USP',fh=ins*bh;
+    const gr=x.createLinearGradient(cx-9,0,cx+9,0);gr.addColorStop(0,'rgba(0,0,0,.4)');gr.addColorStop(.5,col);gr.addColorStop(1,'rgba(0,0,0,.4)');
+    x.fillStyle=gr;x.globalAlpha=0.85;
+    if(fromBottom)x.fillRect(cx-9,top+bh-fh,18,fh);else x.fillRect(cx-9,top,18,fh);
+    x.globalAlpha=1;
+    x.strokeStyle='#7a7d7f';x.lineWidth=1;
+    for(let m=0;m<=7;m++){const y=top+m/7*bh;x.beginPath();x.moveTo(cx-20,y);x.lineTo(cx-13,y);x.stroke();if(i===0||true)T(x,String(fromBottom?7-m:m),cx-27,y,9,'#7a7d7f');}
+    const py=fromBottom?top+bh-fh:top+fh;
+    x.fillStyle='#f2f0e6';x.beginPath();x.moveTo(cx+13,py);x.lineTo(cx+21,py-5);x.lineTo(cx+21,py+5);x.closePath();x.fill();
+    // bump-zone marker
+    x.fillStyle='rgba(240,70,40,.25)';if(!fromBottom)x.fillRect(cx+9,top,3,bh*0.2);
+    x.fillStyle='#050505';x.fillRect(cx-22,top+bh+8,44,18);
+    x.font='700 12px "Roboto Mono",monospace';x.textAlign='center';x.fillStyle='#e6e3d6';x.fillText((ins*7).toFixed(1)+t(' м'),cx,top+bh+17.5);
+    if(g[1]==='RR'&&S.jam>0&&Math.floor(S.t*3)%2===0)T(x,t('ЗАЕД.'),cx,top+bh/2,11,'#ff6a3a');
+    if(g[1]==='AR'&&S.arFail>0&&Math.floor(S.t*3)%2===0)T(x,t('ОТКАЗ'),cx,top+bh/2,11,'#ff6a3a');
+  });
+}
+function vfd(){
+  const P=Math.round(S.n*NOM),xe=Math.round(S.X*100);
+  const line=(s,c)=>c?`<span class="${c}">${s}</span>`:s;
+  let out='';
+  const MW=t('МВт');
+  out+=line(`${t('ПЛАН')} ${String(S.plan).padStart(4)} ${MW}`)+(S.announced?line(` → ${hhmm(S.nextPlanAt)} ${S.nextPlan}`,'hot'):'')+'\n';
+  out+=line(`Xe ${String(xe).padStart(3)}%  ${S.X>1.08&&S.X-S._xPrev>0?t('↑ЯМА'):'      '}`,S.X>1.25?'hot':'')+line(`  ${t('ВЫР')} ${Math.round(S.energy)} ${t('МВт·ч')}`,'dim')+'\n';
+  out+=line(t('ВЫГОВОРЫ')+' ')+line('●'.repeat(S.reps),'hot')+line('○'.repeat(Math.max(0,3-S.reps)),'dim')+(S.damage>0.01?line(`  ${t('ТВЭЛ')} ${Math.round(S.damage*100)}%`,'hot'):'')+'\n';
+  for(const l of LOG.slice(0,4))out+=line(l.t+' ','dim')+line(tr(l.msg).slice(0,30),l.cls)+'\n';
+  if(CINE&&CINE.e2){out='';for(let i=0;i<8;i++){let l='';for(let j=0;j<30;j++)l+=Math.random()<0.5?'█▓▒░'[Math.floor(Math.random()*4)]:' ';out+=line(i===3?' '+tr('НЕТ СВЯЗИ'):l,i===3?'hot':'dim')+'\n';}}
+  if(out!==vfd.last){$('vfd').innerHTML=out;vfd.last=out;}
+}
+function render(){
+  const P=S.n*NOM;
+  const jit=CINE?(Math.random()-0.5)*0.15:0;
+  gauge('gPow',{v:Math.min(4.05,P/1000)+jit,min:0,max:4,major:1,minor:0.2,label:'МОЩНОСТЬ',unit:'МВт ×1000',read:P>9999?t('ЗАШКАЛ'):String(Math.round(P)).padStart(4,' '),
+    readCol:P>3400?'#ff6a3a':'#e6e3d6',zones:[[0,0.7,'#7a3a20'],[3.52,4,'#d33']],marks:[[S.plan/1000,'#f0a81e'],[S.arSet/1000,'#6fd894']]});
+  const rr=S.rho;
+  gauge('gRho',{v:Math.min(1.05,rr)+jit*0.3,min:-1,max:1,major:0.5,minor:0.1,label:'РЕАКТИВН.',unit:'β (эфф.)',fmt:v=>v===0?'0':(v>0?'+':'')+v,read:(rr>=0?'+':'')+rr.toFixed(2),readCol:rr>0.3?'#ff6a3a':'#e6e3d6',zones:[[0.3,0.6,'#e39a1a'],[0.6,1,'#d33']]});
+  gauge('gFlow',{v:S.F*48,min:0,max:64,major:16,minor:4,label:'РАСХОД КМПЦ',unit:'×1000 м³/ч',read:String(Math.round(S.F*48*1000)).padStart(5,' '),zones:[[0,26,'#d33']]});
+  gauge('gVoid',{v:S.void*100,min:0,max:100,major:20,minor:5,label:'ПАРОСОДЕРЖ.',unit:'% объёмн.',read:(S.void*100).toFixed(1)+'%',zones:[[75,100,'#d33']],marks:[[V0*100,'#6fd894']]});
+  drawMap();drawRods();vfd();
+  $('hdr').classList.toggle('sec2',!!(S.secMode||S.dateStr));
+  setDrum('clk',S.secMode?hhmmss(S.tmin+S.tacc):hhmm(S.tmin));
+  setDrum('dOzr',String(Math.max(0,Math.round(ozr()))).padStart(2,'0'));
+  setDrum('dSet',String(S.arSet).padStart(4,'0'));
+  const per=S.period;setDrum('dPer',!isFinite(per)||Math.abs(per)>999?' ∞ ':(per>0?'+':'−')+String(Math.min(99,Math.round(Math.abs(per)))).padStart(2,'0'));
+  $('shiftNo').textContent=S.dateStr||S.shift;const sl=document.querySelector('[data-t="СМЕНА"]');if(sl)sl.textContent=t(S.dateStr?'ДАТА':'СМЕНА');
+  updLamps();updPumps();
+}
+
+/* ===================== SOUND ===================== */
+let AC=null,master=null,muted=false,humG=null,motG=null,noiseBuf=null;
+function initAudio(){
+  if(AC){if(AC.state==='suspended')AC.resume().catch(()=>{});return;}
+  try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.connect(AC.destination);
+    humG=AC.createGain();humG.gain.value=0;humG.connect(master);
+    for(const [f,v] of [[50,0.5],[100,1],[150,0.3]]){const o=AC.createOscillator();o.frequency.value=f;const g=AC.createGain();g.gain.value=v;o.connect(g);g.connect(humG);o.start();}
+    motG=AC.createGain();motG.gain.value=0;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=500;lp.connect(motG);motG.connect(master);
+    const mo=AC.createOscillator();mo.type='sawtooth';mo.frequency.value=118;mo.connect(lp);mo.start();
+    const len=AC.sampleRate;noiseBuf=AC.createBuffer(1,len,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  }catch(e){AC=null;}
+}
+function tone(f,dur,vol,type,t0){if(!AC)return;const t=AC.currentTime+(t0||0),o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.01);g.gain.setValueAtTime(vol,t+dur-0.02);g.gain.linearRampToValueAtTime(0,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.05);}
+function noise(dur,vol,freq,t0){if(!AC)return;const t=AC.currentTime+(t0||0),s=AC.createBufferSource();s.buffer=noiseBuf;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=freq||2000;const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+dur+0.02);}
+const snd={
+  click(){noise(0.03,0.35,3000);tone(1800,0.015,0.03,'square');},
+  toggle(){noise(0.05,0.5,1500);noise(0.03,0.3,4000,0.03);},
+  buzz(){for(let k=0;k<3;k++)tone(420,0.28,0.06,'square',k*0.4);},
+  chime(){tone(880,0.18,0.05,'sine');tone(660,0.3,0.05,'sine',0.2);},
+  klaxon(){for(let k=0;k<6;k++)tone(k%2?240:300,0.42,0.07,'sawtooth',k*0.45);},
+  boom(){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource();s.buffer=noiseBuf;s.loop=true;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(2000,t);f.frequency.exponentialRampToValueAtTime(60,t+3);const g=AC.createGain();g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(0.001,t+3.5);s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+3.6);},
+  geiger(){noise(0.006,0.6,5000);},
+  rumble(on){if(!AC)return;try{if(on&&!this._r){const s=AC.createBufferSource();s.buffer=noiseBuf;s.loop=true;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=140;const g=AC.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(0.9,AC.currentTime+1.2);s.connect(f);f.connect(g);g.connect(master);s.start();this._r={s,g};}
+    else if(!on&&this._r){const r=this._r;r.g.gain.setTargetAtTime(0,AC.currentTime,0.8);setTimeout(()=>{try{r.s.stop();}catch(e){}},4000);this._r=null;}}catch(e){}},
+  boom2(){this.boom();setTimeout(()=>this.boom(),120);noise(1.5,0.8,300);}
+};
+let buzzT=0;
+function audioFrame(dt){
+  if(!AC)return;const t=AC.currentTime;
+  master.gain.setTargetAtTime(muted?0:1,t,0.05);
+  const run=game==='play'||game==='replay';
+  humG.gain.setTargetAtTime(run?0.012+0.01*clamp(S.n,0,1.5):0,t,0.3);
+  motG.gain.setTargetAtTime(run&&rodsMoving?0.02*rodsMoving:0,t,0.05);
+  if(run&&alarmPending){buzzT-=dt;if(buzzT<=0){buzzT=2.5;tone(520,0.5,0.035,'square');}}else buzzT=0;
+  const act=S.damage>0?S.damage*40:0;if(run&&Math.random()<act*dt)snd.geiger();
+}
+
+/* ===================== GAME FLOW ===================== */
+let game='menu',speed=1,lastT=performance.now(),coverOpen=false,coverT=0;
+function setSpeed(v){speed=v;document.querySelectorAll('[data-act=spd1],[data-act=spd10]').forEach(b=>b.classList.toggle('sel',(b.dataset.act==='spd10')===(v===10)));}
+function startGame(){CINE=null;EGG=null;RP=null;capHide();$('bTest').style.display='none';newState();LOG.length=0;log('СМЕНА ПРИНЯТА. N = 3200 МВт');log('ДИСП: ДЕРЖАТЬ 3200 МВт');S._xPrev=1;setSpeed(1);game='play';hideOv();}
+let CINE=null;
+function explode(){
+  if(S.over)return;S.over=true;S.dead=true;
+  const recent=S.t-S.scramT<15;
+  S.reason=S.egg?'egg':S.chern?'chern':recent&&S.scramOzr<15?'scram':!S.prot?'noprot':S.F<0.6?'flow':'prompt';
+  game='boom';S.stuck=true;
+  CINE={t:0,e1:false,e2:false,shake:3,flash:0,dark:0,cracks:[],dust:[],dead:new Set(),blown:new Set(),end:false};
+  log('АЗМ · АЗС · ПЕРИОД < 10 С','hot');snd.rumble(true);snd.klaxon();
+}
+function melt(){if(S.over)return;S.over=true;S.reason='melt';game='melt';snd.klaxon();setTimeout(()=>gameOver('melt'),1500);}
+let best=0;try{best=+localStorage.getItem('rbmk_best')||0;}catch(e){}
+function saveBest(){const sc=Math.round(S.energy);if(sc>best){best=sc;try{localStorage.setItem('rbmk_best',String(best));}catch(e){}return true;}return false;}
+function showOv(html){const o=$('ov');o.innerHTML='<div class="plaque">'+lat(html)+'</div>';o.classList.remove('hidden');}
+function hideOv(){$('ov').classList.add('hidden');}
+function L(ru,pl){return LANG==='pl'?pl:ru;}
+function langPick(){
+  game='menu';newState();
+  showOv(`<h1>РБМК-1000</h1><p class="c" style="letter-spacing:3px;color:#9a9c9a">ВЫБЕРИТЕ ЯЗЫК · WYBIERZ JĘZYK</p>
+  <div class="row"><button class="pb big" data-act="lang_ru">РУССКИЙ</button><button class="pb sel big" data-act="lang_pl">POLSKI</button></div>
+  <p class="c" style="color:#9a9c9a;font-size:13px;margin-top:14px">РУССКИЙ – oryginalne radzieckie napisy na pulpicie (instrukcja po polsku)<br>POLSKI – cały pulpit, dziennik i komunikaty po polsku<br>Język można zmienić później w menu.</p>`);
+}
+function setLang(l){LANG=l;try{localStorage.setItem('rbmk_lang',l);}catch(e){}applyLang();menu();}
+function menu(){
+  game='menu';newState();CINE=null;EGG=null;RP=null;capHide();$('bTest').style.display='none';snd.rumble(false);
+  showOv(`<h1>${L('РБМК-1000','RBMK-1000')}</h1><p class="c" style="letter-spacing:3px;color:#9a9c9a">${L('СИМУЛЯТОР СТАРШЕГО ИНЖЕНЕРА УПРАВЛЕНИЯ РЕАКТОРОМ','SYMULATOR STARSZEGO INŻYNIERA STEROWANIA REAKTOREM')}</p>
+  <p class="c">Przejmujesz zmianę na blokowym pulpicie sterowania. Trzymaj moc zgodnie z planem dyspozytora,<br>pilnuj regulaminu i nie dopuść do awarii. Ksenon, para i pręty AZ‑5 mają swoje humory.</p>
+  ${best?`<p class="c">Rekord produkcji: <span class="stat">${best} ${t('МВт·ч')}</span></p>`:''}
+  <div class="row"><button class="pb sel big" data-act="start">${L('ПРИНЯТЬ СМЕНУ','PRZEJMIJ ZMIANĘ')}</button><button class="pb big" data-act="help">${L('ИНСТРУКЦИЯ','INSTRUKCJA')}</button><button class="pb big" data-act="langpick">${L('ЯЗЫК: RU','JĘZYK: PL')}</button></div>
+  <div class="row" style="margin-top:10px"><button class="pb big" data-act="replay" style="color:#ff8a6a">☢ ${L('ЗАПИСЬ 26.04.1986','ODTWORZENIE 26.04.1986')}</button><button class="pb big" data-act="scenario" style="color:#ff8a6a">☢ ${L('НОЧЬ ИСПЫТАНИЯ','NOC TESTU – ZAGRAJ')}</button></div>
+  <p class="c" style="margin-top:14px;font-size:14px;letter-spacing:1.5px;color:#8f9294">by <b style="color:#f0a81e">JamJam</b></p>`);
+}
+function help(){
+  const wasPlay=game==='play';if(wasPlay)game='pause';
+  const b=ru=>`<b>${t(ru)}</b>`;
+  showOv(`<h1 style="font-size:24px">${L('ИНСТРУКЦИЯ','INSTRUKCJA')}</h1>
+  <h2>CEL</h2><p>Jesteś ${LANG==='pl'?'<b>starszym inżynierem sterowania reaktorem</b> – operatorem przy pulpicie':b('СИУР')+' – starszym inżynierem sterowania reaktorem'}. Utrzymuj moc cieplną zgodnie z ${b('ПЛАН')} dyspozytora (bursztynowy trójkąt na zegarze ${t('МОЩНОСТЬ')}), produkuj energię i dotrwaj do końca zmiany (8 godzin). 3 nagany (${b(L('ВЫГОВОР','NAGANA'))}) = zwolnienie.</p>
+  <h2>STEROWANIE</h2>
+  <p>${b('РР')} <b>▲▼</b> – pręty ręczne: ▲ wyciąga (moc rośnie), ▼ wsuwa (moc spada). Przytrzymaj przycisk.<br>
+  ${b('АР')} · ${b('АВТ')} – automatyczny regulator trzyma moc na wartości ${b('ЗАДАТЧИК АР')} (zielony trójkąt). Ma mały zakres – gdy zaświeci ${b(L('АР ПРЕДЕЛ','AR KRANIEC'))}, dołóż prętami ${t('РР')}.<br>
+  ${b('УСП')} <b>▲▼</b> – skrócone pręty wsuwane od dołu (▲ wsuwa, ▼ wysuwa).<br>
+  ${b(L('ГЦН 1–8','POMPY 1–8'))} – pompy obiegu chłodzenia. Normalnie 6 pracuje, 2 w rezerwie. Dotknij, by uruchomić/zatrzymać; czerwona = awaria, dotknij by ponownie uruchomić.<br>
+  ${b('АЗ-5')} – wyłączenie awaryjne: dotknij raz, by podnieść osłonę, drugi raz – wciśnij. ${b('ВЗВОД')} – odbezpieczenie prętów ${t('АЗ')} po wyłączeniu (gdy moc ≈ 0).<br>
+  ${b(L('ЗАЩИТЫ','ZABEZPIECZENIA'))} – automatyczne zabezpieczenia (${L('АЗМ','AZM')} – przekroczenie mocy, ${L('АЗС','AZS')} – za krótki okres, mały przepływ pomp). Wyłączenie = nagana… i ryzyko.<br>
+  ${b('КВИТ')} – potwierdzenie migających alarmów. <b>×10</b> – przyspieszenie czasu (wraca do ×1 przy alarmie).</p>
+  <h2>FIZYKA (UPROSZCZONA, ALE PRAWDZIWA)</h2>
+  <p><b>Ksenon (Xe)</b> – po obniżeniu mocy ksenon narasta przez kilka godzin i „dusi” reaktor (jama jodowa). Trzeba wyciągać pręty, a ${t('ОЗР')==='ОЗР'?'ОЗР':'OZR'} spada.<br>
+  ${b(L('ОЗР','OZR'))} – operacyjny zapas reaktywności = ile prętów (w przeliczeniu) siedzi w rdzeniu. Regulamin: <b>minimum 15</b>. Przy niskim zapasie wsuwanie prętów z górnego położenia najpierw <b>dodaje</b> reaktywność (grafitowe wypieracze – czerwony pasek przy skali). Wtedy AZ‑5 może zamiast zgasić – rozpędzić reaktor.<br>
+  <b>Dodatni współczynnik parowy</b> – więcej pary w kanałach = większa moc. Mniej pomp lub niska moc (&lt; 700 MW) = reaktor niestabilny.<br>
+  ${b('РЕАКТИВН.')} β – powyżej +1 β reaktor rozpędza się na neutronach natychmiastowych. To koniec.</p>
+  <h2>NAGANY</h2><p>Odchyłka od planu &gt;7% przez 30 min · ${L('ОЗР','OZR')} &lt; 15 przez 20 min · moc &lt; 700 MW przez 20 min · wyłączone zabezpieczenia przez 10 min.</p>
+  ${LANG==='pl'?'':`<h2>SŁOWNICZEK</h2><p>МОЩНОСТЬ – moc · РАСХОД – przepływ · ПАРОСОДЕРЖ. – zawartość pary · ПЕРИОД – okres reaktora (czas wzrostu mocy e‑krotnie) · КАРТОГРАММА – mapa mocy kanałów · ЭВМ «СКАЛА» – komputer kontrolny bloku · ДИСП – dyspozytor · ЖУРНАЛ – dziennik · ЗАЕДАНИЕ ПРИВОДА – zacięcie napędu · ОТКАЗ – awaria · СРОЧНО – pilnie.</p>`}
+  <div class="row"><button class="pb sel big" data-act="${wasPlay?'resume':'back'}">${wasPlay?L('ВЕРНУТЬСЯ','WRÓĆ'):L('НАЗАД','WSTECZ')}</button></div>`);
+}
+function pause(){if(game!=='play')return;game='pause';showOv(`<h1>${t('ПАУЗА')}</h1><div class="row"><button class="pb sel big" data-act="resume">${L('ПРОДОЛЖИТЬ','DALEJ')}</button><button class="pb big" data-act="menu">${L('В МЕНЮ','MENU')}</button></div>`);}
+function shiftEnd(){
+  game='pause';const pct=S.planTot?Math.round(S.planOk/S.planTot*100):100;
+  const gi=pct>90&&S.reps===0?0:pct>75?1:pct>50?2:3;
+  const grade=(LANG==='pl'?['BARDZO DOBRZE','DOBRZE','DOSTATECZNIE','SŁABO']:['ОТЛИЧНО','ХОРОШО','УДОВЛЕТВОРИТЕЛЬНО','ПЛОХО'])[gi];
+  showOv(`<h1 style="font-size:26px">${L('СМЕНА '+S.shift+' СДАНА','ZMIANA '+S.shift+' ZAKOŃCZONA')}</h1>
+   <p class="c">Wyprodukowano w tej zmianie: <span class="stat">${Math.round(S.shiftEnergy)} ${t('МВт·ч')}</span><br>
+   Zgodność z planem: <span class="stat">${pct}%</span> · Nagany łącznie: <span class="stat">${S.reps}/3</span><br>
+   Ocena kierownika zmiany: <span class="stat">${grade}</span></p>
+   <p class="c" style="color:#9a9c9a">Stan reaktora (ksenon, pręty, pompy) przechodzi na następną zmianę. Kolejne zmiany = więcej awarii i niższe plany.</p>
+   <div class="row"><button class="pb sel big" data-act="nextShift">${L('СЛЕДУЮЩАЯ СМЕНА','NASTĘPNA ZMIANA')}</button><button class="pb big" data-act="menu">${L('В МЕНЮ','MENU')}</button></div>`);
+}
+function nextShift(){S.shift++;S.shiftStart=S.tmin;S.shiftEnergy=0;S.planOk=0;S.planTot=0;log('СМЕНА '+S.shift+' ПРИНЯТА');game='play';hideOv();}
+function gameOver(kind){
+  if(game==='over')return;game='over';const nb=saveBest();
+  const AV=L('АВАРИЯ','AWARIA'),OZ=L('ОЗР','OZR');
+  const R={
+    scram:[AV,'Rozerwanie rdzenia po AZ‑5',`Wciśnięcie AZ‑5 przy ${OZ} = ${S.scramOzr} prętów. Pręty weszły od górnego położenia: grafitowe wypieracze wypchnęły wodę z dołu kanałów, reaktywność skoczyła zamiast spaść, para dołożyła resztę – rozbieg na neutronach natychmiastowych. Dokładnie ten mechanizm zadziałał w Czarnobylu 26.04.1986.`],
+    noprot:[AV,'Rozbieg mocy przy wyłączonych zabezpieczeniach','Zabezpieczenia przed przekroczeniem mocy i za krótkim okresem zatrzymałyby reaktor, ale były wyprowadzone. Moc rosła bez kontroli aż do zniszczenia kanałów.'],
+    flow:[AV,'Utrata chłodzenia i skok parowy','Za mały przepływ wody: w kanałach pojawiło się dużo pary, a dodatni współczynnik parowy RBMK zamienił to w gwałtowny wzrost mocy.'],
+    prompt:[AV,'Rozbieg na neutronach natychmiastowych','Reaktywność przekroczyła 1 β – moc rośnie w ułamkach sekundy i nic już nie zdąży zareagować.'],
+    egg:[AV,'01:23:40 · 26.04.1986','Znalazłeś easter egg: przytrzymanie АЗ‑5 przeniosło pulpit w noc 26 kwietnia 1986. Warunki jak wtedy: moc 200 MW, ОЗР ok. 7 prętów, rdzeń zatruty ksenonem, 8 pomp na wybiegu, zabezpieczenia zablokowane. Wciśnięcie АЗ‑5 w takim stanie najpierw rozpędza reaktor. Pełne odtworzenie znajdziesz w menu.'],
+    chern:[AV,'Historia się powtórzyła','Doprowadziłeś blok do stanu z 26.04.1986 i zrzuciłeś pręty z górnego położenia przy zatrutym rdzeniu i małym ОЗР. Efekt końcowy + dodatni współczynnik parowy = rozbieg na neutronach natychmiastowych.'],
+    scen:[AV,'Historia się powtórzyła · 01:23','Przeprowadziłeś test i reaktor zachował się dokładnie tak jak w 1986: zrzut prętów z górnego położenia przy zatrutym rdzeniu, małym ОЗР i 8 pompach dał gwałtowny skok mocy, a para zrobiła resztę. Spróbuj jeszcze raz – i tym razem wyłącz reaktor, zanim będzie za późno.'],
+    melt:[AV,'Uszkodzenie paliwa','Paliwo zbyt długo pracowało w przegrzaniu lub bez chłodzenia. Koszulki prętów paliwowych pękły – blok wyłączony na wiele miesięcy.'],
+    fired:[L('УВОЛЕН','ZWOLNIONY'),'Trzy nagany – zwolnienie dyscyplinarne',S.repList.map(r=>'• '+tr(r)).join('<br>')]
+  }[kind==='boom'?S.reason:kind];
+  capHide();snd.rumble(false);$('bTest').style.display='none';
+  showOv(`<h1 style="color:${kind==='fired'?'#f0a81e':'#ff5a3a'}">${R[0]}</h1><p class="c"><b>${R[1]}</b></p><p>${R[2]}</p>
+   <p class="c">Czas: <span class="stat">${hhmm(S.tmin)}, zmiana ${S.shift}</span> · Wyprodukowano: <span class="stat">${Math.round(S.energy)} ${t('МВт·ч')}</span>${nb?' · <b>NOWY REKORD</b>':` · rekord ${best}`}</p>
+   <div class="row"><button class="pb sel big" data-act="${kind==='scen'?'scenario':'start'}">${kind==='scen'?L('ЕЩЁ РАЗ','JESZCZE RAZ'):L('НОВАЯ СМЕНА','NOWA ZMIANA')}</button>${(kind==='scen'||S.reason==='egg')?`<button class="pb big" data-act="replay">${L('ЗАПИСЬ 1986','ODTWORZENIE 1986')}</button>`:''}<button class="pb big" data-act="menu">${L('В МЕНЮ','MENU')}</button></div>`);
+}
+/* ===================== 26.04.1986 ===================== */
+const D2=1440; // минуты: 26.04 = 1440+
+const RK=[
+ {m:60,date:'25.04.86',n:1,R:[0.8,0.5,0.5],X:1,P:6,plan:3200,log:'СНИЖЕНИЕ МОЩНОСТИ',
+  txt:'25 kwietnia 1986, Czarnobylska EJ, blok nr 4. Reaktor pracuje na pełnej mocy 3200 MW. Przed planowym remontem ma zostać wykonany test: czy obracająca się siłą bezwładności turbina zasili pompy przez czas potrzebny do startu agregatów diesla. Zaczyna się powolne obniżanie mocy.'},
+ {m:13*60+5,n:0.5,R:[0.75,0.5,0.5],X:1.18,P:6,plan:1600,log:'ТГ-7 ОТКЛЮЧЕН',
+  txt:'13:05 – moc obniżona do połowy, 1600 MW. Turbogenerator nr 7 zostaje odłączony, cała para idzie na TG‑8. Przy niższej mocy ksenon‑135 zaczyna narastać i „zatruwać” rdzeń.'},
+ {m:14*60,n:0.5,R:[0.76,0.5,0.5],X:1.24,P:6,plan:1600,log:'САОР ОТКЛЮЧЕНА',log2:'КИЕВЭНЕРГО: ЗАДЕРЖАТЬ ИСПЫТАНИЕ',
+  txt:'14:00 – zgodnie z programem testu odłączono układ awaryjnego chłodzenia rdzenia (САОР). Wtedy dyspozytor Kijowenergo prosi o wstrzymanie – sieć potrzebuje prądu do wieczora. Test przesunięto o prawie 9 godzin.'},
+ {m:23*60+10,n:0.5,R:[0.8,0.5,0.5],X:1.0,P:6,plan:700,log:'СНИЖЕНИЕ ПРОДОЛЖЕНО',
+  txt:'23:10 – dyspozytor zezwala na dalsze obniżanie mocy. Test przygotowany dla zmiany dziennej przypadnie zmianie nocnej. Program przewiduje próbę przy 700–1000 MW.'},
+ {m:D2+5,date:'26.04.86',n:0.225,R:[0.72,0.5,0.5],X:1.05,P:6,plan:700,log:'СМЕНУ ПРИНЯЛ АКИМОВ',
+  txt:'26 kwietnia, 00:05 – moc 720 MW. O północy zmianę przejęli: kierownik zmiany Aleksandr Akimow i starszy inżynier sterowania reaktorem Leonid Toptunow. Test nadzoruje zastępca głównego inżyniera Anatolij Diatłow.'},
+ {m:D2+28,n:0.009,R:[0.72,0.95,0.55],X:1.12,P:6,plan:700,log:'ПРОВАЛ МОЩНОСТИ ДО 30 МВт',hot:1,
+  txt:'00:28 – przy przełączaniu automatyki regulacji moc spada niemal do zera, do ok. 30 MW. Reaktor wpada w „jamę jodową” – ksenon gwałtownie narasta. Bezpiecznie byłoby teraz wyłączyć reaktor i odczekać dobę.'},
+ {m:D2+60,n:0.0625,R:[0.2,0.5,0.6],X:1.4,P:6,plan:700,log:'ПОДЪЁМ МОЩНОСТИ',
+  txt:'Zamiast tego operatorzy wyciągają kolejne pręty, by podnieść moc. Około 01:00 udaje się ustabilizować ok. 200 MW – daleko poniżej 700–1000 MW z programu testu. Zapas reaktywności (ОЗР) topnieje.'},
+ {m:D2+67,n:0.0625,R:[0.08,0.5,0.55],X:1.5,P:8,plan:700,log:'ПУСК ГЦН-7, ГЦН-8',
+  txt:'01:03 i 01:07 – uruchomiono dwie dodatkowe pompy ГЦН (razem 8). Ogromny przepływ przy małej mocy: woda w kanałach jest tuż pod temperaturą wrzenia. Mała zmiana mocy da teraz dużą zmianę ilości pary – a para w RBMK zwiększa moc.'},
+ {m:D2+82.5,n:0.0625,R:[0,0.5,0.5],X:1.62,P:8,plan:700,log:'СКАЛА: ОЗР = 8 СТ.',log2:'ЗАЩИТА ПО ОСТАНОВУ ТГ ЗАБЛОКИРОВАНА',hot:1,
+  txt:'01:22:30 – wydruk komputera СКАЛА pokazuje ОЗР ok. 8 prętów (regulamin: poniżej 15 natychmiast wyłączyć reaktor). Prawie wszystkie pręty są wyciągnięte do samej góry, zabezpieczenie od wyłączenia turbiny zablokowano.'},
+ {m:D2+83+4/60,phys:1,
+  txt:'01:23:04 – start testu. Zamknięto zawory turbiny nr 8. Cztery pompy zasilane z wybiegającej turbiny zwalniają, przepływ maleje, w kanałach przybywa pary. Regulator АР wsuwa pręty, żeby utrzymać moc.'}
+];
+const RP_AZ='01:23:40 – pada polecenie wyłączenia reaktora; Toptunow wciska АЗ‑5. Wszystkie pręty ruszają w dół z górnego położenia… a ich grafitowe końcówki najpierw wypychają wodę z dolnej części rdzenia. Patrz na kartogram i zegar МОЩНОСТЬ.';
+const RP_530='01:23:43 – moc przekracza 530 MW i rośnie lawinowo, sygnały АЗМ i АЗС. Pręty stają po wejściu na ok. 2–2,5 m – kanały paliwowe już się deformują.';
+const RP_E1='01:23:44 – moc chwilowo ok. 100× nominalnej. Paliwo rozpada się, para rozrywa kanały – pierwszy wybuch podrywa ważącą ok. 1000 t górną płytę reaktora.';
+const RP_E2='Kilka sekund później drugi wybuch. Rdzeń zniszczony, rozżarzony grafit i paliwo wylatują na zewnątrz. Na pulpicie gaśnie światło, sypie się pył z sufitu.';
+let RP=null;
+function capShow(time,txt,mini){const c=$('cap');c.classList.remove('hidden');if(!stage.classList.contains('rp')){stage.classList.add('rp');fit();}$('capT').textContent=time;$('capX').textContent=lat(txt);}
+function capHide(){$('cap').classList.add('hidden');if(stage.classList.contains('rp')){stage.classList.remove('rp');fit();}}
+function replayStart(){
+  EGG=null;$('bTest').style.display='none';snd.rumble(false);newState();LOG.length=0;CINE=null;S.secMode=false;S.prot=true;S.arAuto=false;S.dateStr='25.04.86';S.rp=true;
+  RP={i:0,t:0,paused:false,phys:false,pt:0,az:false,m530:false,from:null};
+  game='replay';hideOv();setSpeed(1);replayEnter(0);
+}
+function rkState(){return {n:S.n,R:[S.rods.RR,S.rods.AR,S.rods.USP],X:S.X,m:S.tmin};}
+function replayEnter(i){
+  RP.i=i;RP.t=0;const k=RK[i];
+  if(k.phys){
+    RP.phys=true;RP.pt=0;S.dateStr='26.04.86';
+    loadChernobylState();S.chern=true;S.tmin=Math.floor(k.m);S.tacc=k.m-Math.floor(k.m);S.secMode=true;S.plan=200;
+    startTest();capShow(hhmmss(k.m),k.txt,true);$('bRpN').disabled=true;return;
+  }
+  RP.from=rkState();if(i===0){RP.from={n:1,R:k.R,X:1,m:k.m};}
+  if(k.date)S.dateStr=k.date;S.plan=k.plan;
+  const want=k.P===8?[1,1,1,1,1,1,1,1]:[1,1,1,1,1,1,0,0];
+  for(let j=0;j<8;j++)if(want[j]!==S.pumps[j]){S.pumps[j]=want[j]?3:0;S.pumpT[j]=2.5;}
+  if(k.log){S.tmin=k.m;log(k.log,k.hot?'hot':'');if(k.log2)log(k.log2,'hot');S.tmin=RP.from.m;}
+  capShow(k.m%1===0?hhmm(k.m):hhmmss(k.m),k.txt);$('bRpN').disabled=false;snd.chime();
+}
+function replayFrame(dt){
+  if(RP.paused)return;
+  if(RP.phys){
+    const n=Math.ceil(dt/0.01),h=dt/n;
+    for(let i=0;i<n&&game==='replay';i++){
+      S.t+=h;physStep(h,h/60);RP.pt+=h;S.tacc+=h/60;if(S.tacc>=1){S.tacc-=1;S.tmin+=1;}
+      if(!RP.az&&RP.pt>=34.6&&!coverOpen){coverOpen=true;coverT=5;$('cover').classList.add('open');snd.toggle();}
+      if(!RP.az&&RP.pt>=36){RP.az=true;$('az5').classList.add('pressed');setTimeout(()=>$('az5').classList.remove('pressed'),600);log('АКИМОВ: ГЛУШИ РЕАКТОР!','hot');scram('КНОПКА АЗ-5 (ОПЕРАТОР)');capShow('01:23:40',RP_AZ,true);}
+      if(RP.az&&!RP.m530&&S.n*NOM>530){RP.m530=true;capShow('01:23:43',RP_530,true);}
+      if(RP.pt>60&&!S.over){explode();}
+    }
+    return;
+  }
+  const k=RK[RP.i],f=RP.from,dur=7.5,tt=smooth01(Math.min(1,RP.t/dur));
+  RP.t+=dt;
+  for(let j=0;j<8;j++)if(S.pumps[j]===3){S.pumpT[j]-=dt;if(S.pumpT[j]<=0)S.pumps[j]=1;}
+  S.n=Math.max(1e-4,f.n+(k.n-f.n)*tt);S.C=S.n;S.Tf=S.n;
+  S.rods.RR=f.R[0]+(k.R[0]-f.R[0])*tt;S.rods.AR=f.R[1]+(k.R[1]-f.R[1])*tt;S.rods.USP=f.R[2]+(k.R[2]-f.R[2])*tt;
+  S.X=f.X+(k.X-f.X)*tt;S.tmin=Math.floor(f.m+(k.m-f.m)*tt);
+  const run=S.pumps.reduce((a,p)=>a+(p===1?1:0),0);S.F+=(run/6-S.F)*Math.min(1,dt/2);S.void=voidFn(S.n,S.F);
+  S.rho=(k.n-f.n)*(1-tt)*0.3*Math.sign(RP.t<dur?1:0);S.rate=0;S.period=Infinity;
+  if(RP.t>=dur+Math.max(9,k.txt.length/24)&&RP.i<RK.length-1)replayEnter(RP.i+1);
+}
+function smooth01(x){return x*x*(3-2*x);}
+function replayEnd(){
+  game='over';capHide();snd.rumble(false);
+  showOv(`<h1 style="font-size:26px;color:#ff5a3a">${L('КОНЕЦ ЗАПИСИ','KONIEC ZAPISU')}</h1><p class="c stat">26.04.1986 · 01:23:47</p>
+  <p>Według raportu MAEA <b>INSAG‑7</b> złożyły się na to wady konstrukcyjne RBMK – <b>dodatni współczynnik parowy</b> i pręty z grafitowymi wypieraczami (<b>„efekt końcowy”</b>, który właśnie widziałeś na zegarze mocy) – oraz praca w stanie zakazanym: bardzo mały ОЗР, moc 200 MW zamiast 700+, reaktor zatruty ksenonem, zablokowane zabezpieczenia.</p>
+  <p>Tej nocy zginęły 2 osoby, w kolejnych miesiącach 28 zmarło na chorobę popromienną. 27 kwietnia ewakuowano Prypeć. Po katastrofie wszystkie RBMK przebudowano: zwiększono minimalny zapas reaktywności, zmieniono pręty i przyspieszono АЗ.</p>
+  <p class="c" style="color:#8f9294;font-size:13px">Odtworzenie działa na uproszczonym modelu gry – przebieg jest wierny, liczby przybliżone.</p>
+  <div class="row"><button class="pb sel big" data-act="replay">${L('СМОТРЕТЬ СНОВА','OBEJRZYJ PONOWNIE')}</button><button class="pb big" data-act="scenario">${L('СЫГРАТЬ НОЧЬ ИСПЫТАНИЯ','ZAGRAJ NOC TESTU')}</button><button class="pb big" data-act="menu">${L('В МЕНЮ','MENU')}</button></div>`);
+}
+/* --- игровой сценарий --- */
+function scenarioStart(){
+  newState();LOG.length=0;CINE=null;RP=null;EGG=null;capHide();snd.rumble(false);
+  S.n=0.0625;S.C=S.n;S.Tf=S.n;S.F=8/6;S.void=voidFn(S.n,S.F);S.I=1.1;S.X=1.45;
+  S.rods={RR:0,AR:0.6,USP:0.6,AZ:0};S.pumps=[1,1,1,1,1,1,1,1];S.arAuto=true;S.arSet=200;S.prot=false;S.chern=true;S.scen=true;
+  K0=0;K0=-(rodRho()+CV*(S.void-V0)-CD*(S.Tf-1)-CX*(S.X-1));
+  S.tmin=D2+68;S.dateStr='26.04.86';S.plan=200;S.nextEventAt=1e9;S.nextPlanAt=1e9;
+  log('ПУСК ГЦН-7, ГЦН-8');log('ДИСП: ДЕРЖАТЬ 200 МВт');
+  game='play';setSpeed(1);$('bTest').style.display='';hideOv();
+  showOv(`<h1 style="font-size:24px">${L('НОЧЬ ИСПЫТАНИЯ','NOC TESTU')}</h1><p class="c stat">26.04.1986 · 01:08 · ${L('БЛОК 4','BLOK 4')}</p>
+  <p>Jesteś Toptunowem. Reaktor: <b>200 MW</b>, zatruty ksenonem (który wciąż narasta), 8 pomp, prawie wszystkie pręty wyciągnięte, zabezpieczenia wyłączone. Diatłow chce przeprowadzić test: przycisk <b>${t('ТЕСТ')}</b> w nagłówku zamyka zawory turbiny i pompy 1–4 zaczynają wybieg.</p>
+  <p><b>Możesz powtórzyć historię</b> – odczekaj, aż ksenon zje ОЗР do ok. 7 (ok. 10 minut gry), uruchom test i wciśnij АЗ‑5 (osłona, potem przycisk). <b>Albo ją zmienić</b> – nie rób testu i wyłącz reaktor bezpiecznie: powoli wsuwaj РР (▼), aż moc spadnie prawie do zera. Pilnuj ОЗР – ksenon będzie go zjadał.</p>
+  <div class="row"><button class="pb sel big" data-act="resume">${L('ПРИСТУПИТЬ','DO PULPITU')}</button></div>`);
+  game='pause';
+}
+function scenMinute(){
+  if(S.scen&&!S.over&&S.n<0.004&&!S.won){S.won=true;scenWin();}
+}
+function scenWin(){
+  game='over';
+  showOv(`<h1 style="font-size:24px;color:#7dff8f">${L('РЕАКТОР ЗАГЛУШЕН','REAKTOR WYŁĄCZONY')}</h1><p class="c stat">26.04.1986 · ${hhmm(S.tmin)}</p>
+  <p class="c"><b>Alternatywna historia.</b> Test się nie odbył, Diatłow jest wściekły, protokół pójdzie do Moskwy – ale blok nr 4 stoi, a Prypeć śpi spokojnie.</p>
+  <p>W 1986 wystarczyło przerwać próbę po spadku mocy o 00:28 albo wyłączyć reaktor, gdy ОЗР spadł poniżej 15. ${S.testOn?'Ty zacząłeś test, ale nie dopuściłeś do zrzutu prętów z górnego położenia przy zatrutym rdzeniu.':''}</p>
+  <div class="row"><button class="pb sel big" data-act="scenario">${L('ЕЩЁ РАЗ','JESZCZE RAZ')}</button><button class="pb big" data-act="replay">${L('ЗАПИСЬ 1986','ODTWORZENIE 1986')}</button><button class="pb big" data-act="menu">${L('В МЕНЮ','MENU')}</button></div>`);
+}
+/* --- пасхалка: удержание АЗ-5 --- */
+let azHold=null;
+function triggerEgg(){
+  azHold=null;if(game!=='play'||S.over)return;
+  S.scram=false;S.Bfix=null;S.egg=true;S.scen=true;loadChernobylState();S.tmin=D2+83;S.tacc=37/60;S.secMode=true;S.dateStr='26.04.86';
+  for(let i=0;i<4;i++)S.pumps[i]=4;S.coastF=0.72;
+  log('ИСПЫТАНИЕ: СК ТГ-8 ЗАКРЫТ, ВЫБЕГ','hot');log('АКИМОВ: ГЛУШИ РЕАКТОР!','hot');
+  EGG={t:0,fired:false};snd.chime();
+}
+let EGG=null;
+/* --- кинематограф взрыва --- */
+function makeCracks(cx,cy,n){const out=[];for(let r=0;r<n;r++){let a=Math.random()*Math.PI*2,x=cx,y=cy;const pts=[[x,y]];const len=40+Math.random()*120;let d=0;
+  while(d<len){const st=6+Math.random()*12;a+=(Math.random()-0.5)*0.8;x+=Math.cos(a)*st;y+=Math.sin(a)*st;d+=st;pts.push([x,y]);
+    if(Math.random()<0.18)out.push(...makeCracksBranch(x,y,a));}out.push(pts);}return out;}
+function makeCracksBranch(x,y,a){const pts=[[x,y]];let b=a+(Math.random()<0.5?1:-1)*(0.6+Math.random()*0.6);for(let i=0;i<4;i++){x+=Math.cos(b)*8;y+=Math.sin(b)*8;b+=(Math.random()-0.5)*0.6;pts.push([x,y]);}return [pts];}
+function cineFrame(dt){
+  const c=CINE;c.t+=dt;if(S.secMode&&!c.e2){S.tacc+=dt/60;}
+  S.n=Math.min(150,S.n*Math.exp(dt*3.2));S.rho=Math.min(1.6,S.rho+dt);S.void=Math.min(1,S.void+dt*0.4);S.Tf+=dt*2;
+  if(!c.e1){c.shake=Math.min(16,3+c.t*9);}
+  if(!c.e1&&c.t>=1.3){
+    c.e1=true;c.flash=1.1;c.shake=28;snd.boom();log('ВЗРЫВ','hot');S.F=0.12;
+    c.cracks.push(...makeCracks(436,150,6),...makeCracks(178,215,5));
+    for(const k of Object.keys(lampEl))if(Math.random()<0.35)c.dead.add(k);
+    if(RP||S.scen)capShow('01:23:44',RP_E1,true);
+  }
+  if(!c.e2&&c.t>=3.4){
+    c.e2=true;c.flash=1.5;c.shake=40;snd.boom2();snd.rumble(false);
+    c.cracks.push(...makeCracks(610,150,6),...makeCracks(880,170,5),...makeCracks(180,440,4));
+    for(const k of Object.keys(lampEl))if(Math.random()<0.5)c.dead.add(k);
+    for(let i=0;i<260;i++)c.dust.push({x:Math.random()*1100,y:-Math.random()*540,v:20+Math.random()*60,r:0.6+Math.random()*1.8,a:0.3+Math.random()*0.5});
+    if(RP||S.scen)capShow('01:23:47',RP_E2,true);
+  }
+  c.flash=Math.max(0,c.flash-dt*1.4);
+  if(c.e1)c.shake=Math.max(c.e2?0.8:2,c.shake-dt*(c.e2?14:18));
+  c.dark+=((c.e2?0.84:0)-c.dark)*Math.min(1,dt*1.2);
+  for(const d of c.dust){d.y+=d.v*dt;d.x+=Math.sin(d.y/30)*dt*8;if(d.y>545){d.y=-5;d.x=Math.random()*1100;}}
+  if(!c.end&&c.t>=(RP?9:7.5)){c.end=true;if(RP)replayEnd();else if(S.scen&&!S.egg)gameOver('scen');else gameOver('boom');}
+}
+function drawFx(){
+  const {x}=CANV.fx;x.clearRect(0,0,1100,540);
+  if(EGG&&!EGG.fired){const a=0.5+0.5*Math.sin(performance.now()/90);x.font='700 64px "Roboto Mono",monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle=`rgba(255,70,40,${0.35+0.5*a})`;x.fillText('01:23:40',550,270);x.font='700 20px "Roboto Condensed",sans-serif';x.fillText('26.04.1986',550,320);}
+  const c=CINE;if(!c)return;
+  if(c.dark>0.01){x.fillStyle=`rgba(0,0,0,${c.dark})`;x.fillRect(0,0,1100,540);
+    const fl=Math.random()<0.9?0.18+Math.random()*0.08:0.02;const g=x.createRadialGradient(550,60,10,550,60,700);g.addColorStop(0,`rgba(255,40,20,${fl})`);g.addColorStop(1,'rgba(255,40,20,0)');x.fillStyle=g;x.fillRect(0,0,1100,540);}
+  x.lineCap='round';
+  for(const p of c.cracks){x.strokeStyle='rgba(0,0,0,.55)';x.lineWidth=2.6;x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0]+1,q[1]+1):x.moveTo(q[0]+1,q[1]+1));x.stroke();
+    x.strokeStyle='rgba(235,240,240,.7)';x.lineWidth=1.1;x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.stroke();}
+  for(const d of c.dust){x.fillStyle=`rgba(200,190,170,${d.a})`;x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.fill();}
+  if(c.flash>0){x.fillStyle=`rgba(255,250,235,${Math.min(1,c.flash)})`;x.fillRect(0,0,1100,540);}
+}
+/* ===================== INPUT ===================== */
+function act(a,el){
+  initAudio();
+  if(a==='lang_ru'){snd.click();return setLang('ru');}
+  if(a==='lang_pl'){snd.click();return setLang('pl');}
+  if(a==='langpick'){snd.click();return langPick();}
+  if(a==='start'){snd.click();return startGame();}
+  if(a==='help'){snd.click();return help();}
+  if(a==='back'){snd.click();return menu();}
+  if(a==='resume'){snd.click();game='play';hideOv();return;}
+  if(a==='menu'){snd.click();return menu();}
+  if(a==='nextShift'){snd.click();return nextShift();}
+  if(a==='snd'){muted=!muted;$('bSnd').classList.toggle('sel',muted);$('bSnd').textContent=t(muted?'ТИХО':'ЗВУК');return;}
+  if(a==='replay'){snd.click();return replayStart();}
+  if(a==='scenario'){snd.click();return scenarioStart();}
+  if(a==='rp_exit'){snd.click();snd.rumble(false);return menu();}
+  if(a==='rp_pause'&&RP){snd.click();RP.paused=!RP.paused;$('bRpP').textContent=RP.paused?'▶':'II';$('bRpP').classList.toggle('sel',RP.paused);return;}
+  if(a==='rp_next'&&RP&&!RP.phys){snd.click();RP.paused=false;$('bRpP').textContent='II';if(RP.i<RK.length-1)replayEnter(RP.i+1);return;}
+  if(game==='replay'||game==='boom')return;
+  if(a==='pause'){snd.click();return pause();}
+  if(game!=='play')return;
+  if(a==='spd1'){snd.click();return setSpeed(1);}
+  if(a==='spd10'){snd.click();if(S.secMode)return;return setSpeed(10);}
+  if(a==='test'){snd.click();if(!S.testOn){startTest();S.secMode=true;setSpeed(1);$('bTest').classList.add('on');}return;}
+  if(a==='setUp'){snd.click();S.arSet=Math.min(3600,S.arSet+100);return;}
+  if(a==='setDn'){snd.click();S.arSet=Math.max(0,S.arSet-100);return;}
+  if(a==='ar'){snd.click();if(S.arFail>0){log('АР НЕИСПРАВЕН');return;}S.arAuto=!S.arAuto;if(S.arAuto)S.arSet=Math.round(S.n*NOM/100)*100;log(S.arAuto?'АР В АВТОМАТ, ЗАД. '+S.arSet:'АР ОТКЛЮЧЕН');return;}
+  if(a==='kvit'){snd.click();for(const k in lampAck)lampAck[k]=true;return;}
+  if(a==='prot'){snd.toggle();S.prot=!S.prot;log(S.prot?'ЗАЩИТЫ ВВЕДЕНЫ':'ЗАЩИТЫ ВЫВЕДЕНЫ!',S.prot?'':'hot');return;}
+  if(a==='vzvod'){snd.click();if(!S.scram){log('АЗ НЕ СРАБАТЫВАЛА');return;}if(S.n>0.02){log('ВЗВОД ЗАПРЕЩЁН: N > 2%');return;}S.scram=false;S.Bfix=null;S.azReset=true;log('ВЗВОД АЗ. СТЕРЖНИ АЗ ВВЕРХ');return;}
+  if(a==='az5'){
+    if(!coverOpen){coverOpen=true;coverT=4;$('cover').classList.add('open');snd.toggle();return;}
+    $('az5').classList.add('pressed');snd.click();scram('КНОПКА АЗ-5 (ОПЕРАТОР)');if(!S.egg&&!S.scen)azHold={t0:performance.now()};else setTimeout(()=>$('az5').classList.remove('pressed'),250);return;
+  }
+  if(a.startsWith('pump')){
+    const i=+a.slice(4),p=S.pumps[i];snd.click();
+    if(p===1){S.pumps[i]=0;log('ГЦН-'+(i+1)+' ОСТАНОВЛЕН');}
+    else if(p===0||p===2){S.pumps[i]=3;S.pumpT[i]=8;log('ПУСК ГЦН-'+(i+1));}
+    return;
+  }
+}
+let lastOvAct=0;
+$('ov').addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;e.preventDefault();e.stopPropagation();const now=performance.now();if(now-lastOvAct<350)return;lastOvAct=now;act(el.dataset.act,el);});
+stage.addEventListener('pointerdown',e=>{
+  if(e.target.closest('#ov'))return;
+  const el=e.target.closest('[data-act],[data-hold]');if(!el)return;
+  e.preventDefault();
+  if(el.dataset.hold){initAudio();if(game!=='play')return;hold[el.dataset.hold]=1;el.classList.add('down');snd.click();
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    const up=()=>{hold[el.dataset.hold]=0;el.classList.remove('down');el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.removeEventListener('lostpointercapture',up);};
+    el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);return;}
+  act(el.dataset.act,el);
+},{passive:false});
+stage.addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('pointerup',()=>{if(azHold){azHold=null;$('az5').classList.remove('pressed');}});window.addEventListener('pointercancel',()=>{if(azHold){azHold=null;$('az5').classList.remove('pressed');}});
+const KH={ArrowUp:'RRup',ArrowDown:'RRdn',PageUp:'USPup',PageDown:'USPdn'};
+window.addEventListener('keydown',e=>{if(KH[e.code]){hold[KH[e.code]]=1;e.preventDefault();}
+  if(e.repeat)return;if(e.code==='KeyA')act('ar');if(e.code==='KeyK')act('kvit');if(e.code==='KeyP'||e.code==='Escape')game==='play'?pause():game==='pause'&&act('resume');});
+window.addEventListener('keyup',e=>{if(KH[e.code])hold[KH[e.code]]=0;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(game==='play')pause();for(const k in hold)hold[k]=0;if(AC)AC.suspend().catch(()=>{});}else if(AC)AC.resume().catch(()=>{});});
+
+/* ===================== LOOP ===================== */
+function frame(now){
+  const dt=Math.min(0.1,(now-lastT)/1000);lastT=now;
+  if(game==='play'){
+    if(azHold&&now-azHold.t0>2500)triggerEgg();
+    if(EGG){EGG.t+=dt;if(!EGG.fired&&EGG.t>1.6){EGG.fired=true;$('az5').classList.add('pressed');setTimeout(()=>$('az5').classList.remove('pressed'),400);coverOpen=true;coverT=4;$('cover').classList.add('open');scram('КНОПКА АЗ-5 (ОПЕРАТОР)');}}
+    const n=Math.ceil(dt/0.01),h=dt/n;
+    for(let i=0;i<n&&game==='play';i++){
+      S.t+=h;const dm=S.secMode?h/60:h*speed;
+      if(EGG&&!EGG.fired)break;
+      physStep(h,dm);
+      if(game!=='play')break;
+      S.tacc+=dm;while(S.tacc>=1&&game==='play'){S.tacc-=1;S._xPrev=S.X;minuteTick();}
+      if(S.jam>0)S.jam-=h;
+    }
+  }else if(game==='replay')replayFrame(dt);
+  else if(game==='boom'&&CINE)cineFrame(dt);
+  if(game==='play'&&S.scen&&!S.egg&&!S.over&&!S.won&&S.n<0.004){S.won=true;scenWin();}
+  if(coverOpen&&!(RP&&RP.az)){coverT-=dt;if(coverT<=0){coverOpen=false;$('cover').classList.remove('open');}}
+  let sh=0;if(CINE&&(game==='boom'||game==='over'))sh=game==='boom'?CINE.shake:0;else if((game==='play'||game==='replay')&&S.n>1.2)sh=Math.min(6,(S.n-1)*2.5);
+  applyShake(sh);
+  render();drawFx();audioFrame(dt);
+  requestAnimationFrame(frame);
+}
+fit();autoTag();newState();LOG.length=0;if(LANG!=='ru')LANG='pl';applyLang();menu();render();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
