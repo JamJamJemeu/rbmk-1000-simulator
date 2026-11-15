@@ -1,5 +1,16 @@
 # Changelog / Historia zmian / История изменений
 
+## 1.0.5 — 2026-11-15
+
+**PL**
+- Odtworzenie: usunięto zwolnione tempo ×0.3 – po AZ-5 akcja idzie w normalnym tempie, a opisy 01:23:40–01:23:47 zostają na pasku kolejno, każdy wystarczająco długo do przeczytania (także po wybuchu).
+
+**EN**
+- Replay: slow motion removed; the action runs at normal speed and the final captions stay on screen one after another long enough to read.
+
+**RU**
+- Запись: замедление убрано, последние подписи показываются по очереди достаточно долго.
+
 ## 1.0.4 — 2026-11-15
 
 **PL**

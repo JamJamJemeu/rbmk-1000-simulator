@@ -710,9 +710,9 @@ const RP_E2='Kilka sekund później drugi wybuch. Rdzeń zniszczony, rozżarzony
 let RP=null;
 function capShow(time,txt,mini){const c=$('cap');c.classList.remove('hidden');if(!stage.classList.contains('rp')){stage.classList.add('rp');fit();}$('capT').textContent=time;$('capX').textContent=lat(txt);}
 let CQ=[],capCur=null;
-function capMin(txt){return Math.max(7,txt.length/17);}
+function capMin(txt){return Math.max(6,txt.length/20);}
 function capPush(time,txt){if(!RP){capShow(time,txt,true);return;}if(!capCur||capCur.age>=capCur.min){capCur={time,txt,age:0,min:capMin(txt)};capShow(time+SLOWTAG(),txt,true);}else CQ.push({time,txt});}
-function SLOWTAG(){return RP&&RP.az?'  ⏱ ×0.3':'';}
+function SLOWTAG(){return '';}
 function capFrame(dt){if(!capCur)return;capCur.age+=dt;if(capCur.age>=capCur.min&&CQ.length){const n=CQ.shift();capCur={time:n.time,txt:n.txt,age:0,min:capMin(n.txt)};capShow(n.time+SLOWTAG(),n.txt,true);}}
 function capDone(){return !capCur||(CQ.length===0&&capCur.age>=capCur.min);}
 function capHide(){CQ=[];capCur=null;$('cap').classList.add('hidden');if(stage.classList.contains('rp')){stage.classList.remove('rp');fit();}}
@@ -739,7 +739,7 @@ function replayEnter(i){
 function replayFrame(dt){
   if(RP.paused)return;
   if(RP.phys){
-    capFrame(dt);const reading=capCur&&capCur.age<capCur.min;const sdt=RP.az?dt*(reading?0.06:0.3):dt;
+    capFrame(dt);const sdt=dt;
     const n=Math.ceil(sdt/0.01),h=sdt/n;
     for(let i=0;i<n&&game==='replay';i++){
       S.t+=h;physStep(h,h/60);RP.pt+=h;S.tacc+=h/60;if(S.tacc>=1){S.tacc-=1;S.tmin+=1;}
@@ -810,7 +810,7 @@ function makeCracks(cx,cy,n){const out=[];for(let r=0;r<n;r++){let a=Math.random
     if(Math.random()<0.18)out.push(...makeCracksBranch(x,y,a));}out.push(pts);}return out;}
 function makeCracksBranch(x,y,a){const pts=[[x,y]];let b=a+(Math.random()<0.5?1:-1)*(0.6+Math.random()*0.6);for(let i=0;i<4;i++){x+=Math.cos(b)*8;y+=Math.sin(b)*8;b+=(Math.random()-0.5)*0.6;pts.push([x,y]);}return [pts];}
 function cineFrame(dt){
-  if(RP){capFrame(dt);dt*=(capCur&&capCur.age<capCur.min)?0.2:0.5;}
+  if(RP){capFrame(dt);}
   const c=CINE;c.t+=dt;if(S.secMode&&!c.e2){S.tacc+=dt/60;}
   S.n=Math.min(150,S.n*Math.exp(dt*3.2));S.rho=Math.min(1.6,S.rho+dt);S.void=Math.min(1,S.void+dt*0.4);S.Tf+=dt*2;
   if(!c.e1){c.shake=Math.min(16,3+c.t*9);}
