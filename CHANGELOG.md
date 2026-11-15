@@ -1,5 +1,17 @@
 # Changelog / Historia zmian / История изменений
 
+## 1.0.2 — 2026-11-15
+
+**PL**
+- Naprawiono błąd „setValueAtTime… -0.005”, który przy pierwszym kliknięciu w Chrome blokował grę ekranem błędu.
+- Ekran błędu pokazuje się już tylko wtedy, gdy gra w ogóle nie wystartuje.
+
+**EN**
+- Fixed the “setValueAtTime … -0.005” audio error that blocked the game on the first click in Chrome. The error screen now appears only if the game fails to start.
+
+**RU**
+- Исправлена ошибка звука «setValueAtTime … -0.005», блокировавшая игру при первом нажатии в Chrome.
+
 ## 1.0.1 — 2026-11-15
 
 **PL**
