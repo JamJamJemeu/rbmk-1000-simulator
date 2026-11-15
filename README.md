@@ -6,6 +6,9 @@
 
 by **JamJam**
 
+<p align="center"><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/"><img src="docs/play.png" alt="▶ Zagraj online · Play now · Играть" width="860"></a></p>
+<p align="center"><sub>Kliknij, żeby zagrać w przeglądarce – telefon (poziomo) lub komputer · Click to play · Нажмите, чтобы играть<br><a href="https://jamjamjemeu.github.io/rbmk-1000-simulator/">https://jamjamjemeu.github.io/rbmk-1000-simulator/</a></sub></p>
+
 | Pulpit (PL) | Пульт (RU) |
 |---|---|
 | ![Pulpit sterowania](docs/panel.jpg) | ![Пульт управления](docs/panel-ru.jpg) |
@@ -22,9 +25,10 @@ Symulator blokowej nastawni reaktora RBMK-1000 w klimacie radzieckiej sterowni: 
 
 ### Jak uruchomić
 
-- **Online:** jeśli w repozytorium włączone są GitHub Pages – otwórz stronę projektu.
+- **Online (najprościej):** ▶ **[jamjamjemeu.github.io/rbmk-1000-simulator](https://jamjamjemeu.github.io/rbmk-1000-simulator/)** – bez pobierania i instalacji.
 - **Lokalnie:** pobierz `index.html` i otwórz go w przeglądarce (Chrome, Edge, Firefox, Safari).
-- **Na Androidzie:** otwórz stronę w Chrome → menu ⋮ → „Dodaj do ekranu głównego”, żeby grać na pełnym ekranie.
+- **Na telefonie:** otwórz link w Chrome / Safari → „Dodaj do ekranu głównego”, żeby grać na pełnym ekranie jak w aplikacji.
+- **Uwaga:** pobrany plik otwieraj w przeglądarce, nie w podglądzie Messengera / WhatsAppa / Gmaila – tam gra się nie uruchomi.
 
 ### Tryby gry
 
@@ -72,7 +76,7 @@ A browser simulator of the RBMK-1000 unit control room, styled like a Soviet con
 
 ### How to run
 
-- **Online:** open the project page if GitHub Pages is enabled for this repository.
+- **Online (easiest):** ▶ **[jamjamjemeu.github.io/rbmk-1000-simulator](https://jamjamjemeu.github.io/rbmk-1000-simulator/)** – no download, no install.
 - **Locally:** download `index.html` and open it in a browser.
 - **Android:** open the page in Chrome → ⋮ menu → “Add to Home screen” for full screen.
 
@@ -92,6 +96,8 @@ Interface language: **Polish** (default) or **Russian** – switch in the menu.
 ---
 
 ## Русский
+
+▶ **Играть онлайн: [jamjamjemeu.github.io/rbmk-1000-simulator](https://jamjamjemeu.github.io/rbmk-1000-simulator/)**
 
 Симулятор блочного щита управления реактора РБМК-1000 в браузере, оформленный как советский пульт: бирюзовая крашеная рама, чёрные приборы с латунными винтами, барабанные счётчики, светящиеся кнопки и янтарный дисплей ЭВМ «СКАЛА». Один файл `index.html` – без установки, работает на телефоне (горизонтально) и на ПК.
 
