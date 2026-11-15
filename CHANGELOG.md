@@ -1,5 +1,17 @@
 # Changelog / Historia zmian / История изменений
 
+## 1.0.3 — 2026-11-15
+
+**PL**
+- Uszkodzenie paliwa nie kończy już gry od razu: paliwo pęka, kanały się deformują i blokują pręty (czerwona linia na skali), a para z rozerwanego paliwa dalej podbija moc – aż do wybuchu, jeśli nie opanujesz sytuacji. Uszkodzone kanały widać na kartogramie.
+- „Noc testu” startuje o 01:20, bliżej stanu z 1986: test + AZ-5 kończy się jak wtedy. Uratować reaktor można tylko powolnym wsuwaniem prętów RR.
+
+**EN**
+- Fuel damage no longer ends the game at once: fuel cracks, channels deform and block the rods, and steam from failed fuel keeps raising power until the core ruptures. “Night of the test” now starts at 01:20, closer to the 1986 state.
+
+**RU**
+- Повреждение ТВЭЛ больше не завершает игру сразу: каналы деформируются и блокируют стержни, пар поднимает мощность до разрушения. «Ночь испытания» начинается в 01:20.
+
 ## 1.0.2 — 2026-11-15
 
 **PL**

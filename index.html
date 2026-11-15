@@ -215,7 +215,7 @@ const TRX=[
  [/СНИЖЕНИЕ ПРОДОЛЖЕНО/g,'OBNIŻANIE WZNOWIONE'],[/СМЕНУ ПРИНЯЛ АКИМОВ/g,'ZMIANĘ PRZEJĄŁ AKIMOW'],[/ПРОВАЛ МОЩНОСТИ ДО 30/g,'SPADEK MOCY DO 30'],[/ПОДЪЁМ МОЩНОСТИ/g,'PODNOSZENIE MOCY'],
  [/СКАЛА: ОЗР = 8 СТ\./g,'SKAŁA: OZR = 8 PR.'],[/ЗАЩИТА ПО ОСТАНОВУ ТГ ЗАБЛОКИРОВАНА/g,'ZABEZP. OD WYŁ. TURBINY ZABLOK.'],
  [/ИСПЫТАНИЕ: СК ТГ-8 ЗАКРЫТ, ВЫБЕГ/g,'TEST: ZAWORY TG-8 ZAMKN., WYBIEG'],[/АКИМОВ: ГЛУШИ РЕАКТОР!/g,'AKIMOW: GAŚ REAKTOR!'],[/СТЕРЖНИ АЗ ОСТАНОВИЛИСЬ!/g,'PRĘTY AZ STANĘŁY!'],
- [/АЗМ · АЗС · ПЕРИОД < 10 С/g,'AZM · AZS · OKRES < 10 S'],[/ВЗРЫВ/g,'WYBUCH'],[/НЕТ СВЯЗИ/g,'BRAK ŁĄCZNOŚCI'],[/ИСПЫТАНИЕ/g,'TEST'],
+ [/АЗМ · АЗС · ПЕРИОД < 10 С/g,'AZM · AZS · OKRES < 10 S'],[/СТЕРЖНИ НЕ ИДУТ: КАНАЛЫ ДЕФОРМИРОВАНЫ/g,'PRĘTY STOJĄ: KANAŁY ZDEFORM.'],[/ПОВРЕЖДЕНИЕ ТВЭЛ!/g,'USZKODZENIE PALIWA!'],[/РАЗРЫВ ТК · ДЕФОРМАЦИЯ КАНАЛОВ/g,'PĘKANIE KANAŁÓW · DEFORMACJA'],[/ВЗРЫВ/g,'WYBUCH'],[/НЕТ СВЯЗИ/g,'BRAK ŁĄCZNOŚCI'],[/ИСПЫТАНИЕ/g,'TEST'],
  [/ВЫГОВОР:/g,'NAGANA:'],[/ГЦН-(\d)/g,'POMPA $1'],[/ДИСП:/g,'DYSP:'],[/ПЛАН/g,'PLAN'],[/МВт/g,'MW'],[/АЗ-5/g,'AZ-5']
 ];
 const LAT=[['МОЩНОСТЬ','MOC'],['СКАЛА','SKAŁA'],['СИУР','operator reaktora'],['САОР','SAOR'],['ГЦН','GCN'],['ОЗР','OZR'],['АЗ‑5','AZ‑5'],['АЗ-5','AZ-5'],['АЗМ','AZM'],['АЗС','AZS'],['УСП','USP'],['РР','RR'],['АР','AR'],['АЗ','AZ']];
@@ -281,12 +281,14 @@ function loadChernobylState(){
 function startTest(){for(let i=0;i<4;i++)S.pumps[i]=4;S.coastF=1;S.testOn=true;log('ИСПЫТАНИЕ: СК ТГ-8 ЗАКРЫТ, ВЫБЕГ','hot');}
 const hold={RRup:0,RRdn:0,USPup:0,USPdn:0};
 let rodsMoving=0;
+function rodLim(){return 1-0.66*clamp((S.damage-0.08)/0.45,0,1);}
 function moveRods(dt){
   const R=S.rods;rodsMoving=0;
-  if(S.scram){if(S.stuck)return;for(const k in R){if(R[k]<1){R[k]=Math.min(1,R[k]+0.06*dt);rodsMoving=1;}}return;}
+  const lim=rodLim();
+  if(S.scram){if(S.stuck)return;let blocked=false;for(const k in R){const L=k==='USP'?1:lim;if(R[k]<L){R[k]=Math.min(L,R[k]+0.06*dt);rodsMoving=1;}else if(L<1&&R[k]>=L-1e-3)blocked=true;}if(blocked&&!S.rodMsg){S.rodMsg=true;log('СТЕРЖНИ НЕ ИДУТ: КАНАЛЫ ДЕФОРМИРОВАНЫ','hot');}return;}
   if(S.azReset){R.AZ=Math.max(0,R.AZ-0.035*dt);rodsMoving=1;if(R.AZ<=0)S.azReset=false;}
   const sp=0.04*dt;
-  if(S.jam<=0){if(hold.RRup&&R.RR>0){R.RR-=sp;rodsMoving=1;}if(hold.RRdn&&R.RR<1){R.RR+=sp;rodsMoving=1;}}
+  if(S.jam<=0){if(hold.RRup&&R.RR>0){R.RR-=sp;rodsMoving=1;}if(hold.RRdn&&R.RR<lim){R.RR=Math.min(lim,R.RR+sp);rodsMoving=1;}}
   if(hold.USPup&&R.USP<1){R.USP+=sp;rodsMoving=1;}if(hold.USPdn&&R.USP>0){R.USP-=sp;rodsMoving=1;}
   if(S.arAuto&&S.arFail<=0){
     const e=S.arSet/NOM-S.n,d=S.n*S.rate;
@@ -301,7 +303,7 @@ function physStep(dt,dm){
   if(S.pumps.includes(4))S.coastF=Math.max(0.55,S.coastF-dt*0.01);
   S.F+=(running/6-S.F)*(1-Math.exp(-dt/3));
   moveRods(dt);
-  S.void+=(voidFn(S.n,S.F)-S.void)*(1-Math.exp(-dt/1.0));
+  S.void+=(Math.min(1,voidFn(S.n,S.F)+0.9*S.damage)-S.void)*(1-Math.exp(-dt/1.0));
   S.Tf+=(S.n-S.Tf)*(1-Math.exp(-dt/3));
   const L=1/792;
   S.I+=1.39*L*(S.n-S.I)*dm;
@@ -321,10 +323,12 @@ function physStep(dt,dm){
   S.tilt.x+=(S.tilt.tx-S.tilt.x)*dt*0.3;S.tilt.y+=(S.tilt.ty-S.tilt.y)*dt*0.3;
   // повреждения
   if(S.Tf>1.25)S.damage+=(S.Tf-1.25)*0.35*dt;
+  if(S.damage>0.02&&!S.dmgMsg1){S.dmgMsg1=true;log('ПОВРЕЖДЕНИЕ ТВЭЛ!','hot');snd.buzz();}
+  if(S.damage>0.25&&!S.dmgMsg2){S.dmgMsg2=true;log('РАЗРЫВ ТК · ДЕФОРМАЦИЯ КАНАЛОВ','hot');snd.buzz();}
   if(S.F<0.3&&S.n>0.15)S.damage+=S.n*0.25*dt;
   if(S.scram&&!S.stuck&&S.n>2){S.stuck=true;log('СТЕРЖНИ АЗ ОСТАНОВИЛИСЬ!','hot');}
   if(S.n>3.5)return explode();
-  if(S.damage>=1)return melt();
+  if(S.damage>=1){S.reason='melt';return explode();}
   // защиты
   if(S.prot&&!S.scram){
     if(S.n>1.10)scram('АЗМ: ПРЕВЫШЕНИЕ МОЩНОСТИ');
@@ -484,6 +488,7 @@ function drawMap(){
       if(CINE){const sp=CINE.t*0.9,d=Math.min(Math.hypot(c.x+0.25,c.y-0.35),Math.hypot(c.x-0.3,c.y-0.45));
         v=d<sp?2.2+Math.random()*0.3:Math.min(v,1.45)+Math.random()*0.2;
         if(CINE.e1){const key=c.i*100+c.j;if(!CINE.blown.has(key)&&Math.random()<0.004*(CINE.e2?3:1))CINE.blown.add(key);if(CINE.blown.has(key)){x.fillStyle=Math.random()<0.1?'#fff':'#050505';x.fillRect(px,py,cs-1,cs-1);continue;}}}
+      if(S.damage>0.02&&hash(c.i*131+c.j*7)<S.damage*0.75){x.fillStyle=Math.random()<0.25?'#ff3b2f':'#3a0a06';x.fillRect(px,py,cs-1,cs-1);continue;}
       x.fillStyle=heat(v);x.fillRect(px,py,cs-1,cs-1);}
   }
   x.font='700 9px "Roboto Condensed",sans-serif';x.textAlign='left';x.textBaseline='middle';
@@ -511,6 +516,7 @@ function drawRods(){
     x.fillStyle='rgba(240,70,40,.25)';if(!fromBottom)x.fillRect(cx+9,top,3,bh*0.2);
     x.fillStyle='#050505';x.fillRect(cx-22,top+bh+8,44,18);
     x.font='700 12px "Roboto Mono",monospace';x.textAlign='center';x.fillStyle='#e6e3d6';x.fillText((ins*7).toFixed(1)+t(' м'),cx,top+bh+17.5);
+    const lm=rodLim();if(!fromBottom&&lm<0.999){const ly=top+lm*bh;x.fillStyle='#ff3b2f';x.fillRect(cx-14,ly-1.5,28,3);x.fillStyle='rgba(255,59,47,.18)';x.fillRect(cx-9,ly,18,bh-lm*bh);}
     if(g[1]==='RR'&&S.jam>0&&Math.floor(S.t*3)%2===0)T(x,t('ЗАЕД.'),cx,top+bh/2,11,'#ff6a3a');
     if(g[1]==='AR'&&S.arFail>0&&Math.floor(S.t*3)%2===0)T(x,t('ОТКАЗ'),cx,top+bh/2,11,'#ff6a3a');
   });
@@ -591,7 +597,7 @@ let CINE=null;
 function explode(){
   if(S.over)return;S.over=true;S.dead=true;
   const recent=S.t-S.scramT<15;
-  S.reason=S.egg?'egg':S.chern?'chern':recent&&S.scramOzr<15?'scram':!S.prot?'noprot':S.F<0.6?'flow':'prompt';
+  S.reason=S.egg?'egg':S.chern?'chern':recent&&S.scramOzr<15?'scram':(S.reason==='melt'||S.damage>0.3)?'melt':!S.prot?'noprot':S.F<0.6?'flow':'prompt';
   game='boom';S.stuck=true;
   CINE={t:0,e1:false,e2:false,shake:3,flash:0,dark:0,cracks:[],dust:[],dead:new Set(),blown:new Set(),end:false};
   log('АЗМ · АЗС · ПЕРИОД < 10 С','hot');snd.rumble(true);snd.klaxon();
@@ -635,6 +641,7 @@ function help(){
   <p><b>Ksenon (Xe)</b> – po obniżeniu mocy ksenon narasta przez kilka godzin i „dusi” reaktor (jama jodowa). Trzeba wyciągać pręty, a ${t('ОЗР')==='ОЗР'?'ОЗР':'OZR'} spada.<br>
   ${b(L('ОЗР','OZR'))} – operacyjny zapas reaktywności = ile prętów (w przeliczeniu) siedzi w rdzeniu. Regulamin: <b>minimum 15</b>. Przy niskim zapasie wsuwanie prętów z górnego położenia najpierw <b>dodaje</b> reaktywność (grafitowe wypieracze – czerwony pasek przy skali). Wtedy AZ‑5 może zamiast zgasić – rozpędzić reaktor.<br>
   <b>Dodatni współczynnik parowy</b> – więcej pary w kanałach = większa moc. Mniej pomp lub niska moc (&lt; 700 MW) = reaktor niestabilny.<br>
+  <b>Przegrzanie paliwa</b> – paliwo zaczyna pękać, kanały się deformują: czerwona linia na skali prętów pokazuje, dokąd pręty jeszcze wejdą. Para z rozerwanego paliwa dalej podbija moc – trzeba działać od razu.<br>
   ${b('РЕАКТИВН.')} β – powyżej +1 β reaktor rozpędza się na neutronach natychmiastowych. To koniec.</p>
   <h2>NAGANY</h2><p>Odchyłka od planu &gt;7% przez 30 min · ${L('ОЗР','OZR')} &lt; 15 przez 20 min · moc &lt; 700 MW przez 20 min · wyłączone zabezpieczenia przez 10 min.</p>
   ${LANG==='pl'?'':`<h2>SŁOWNICZEK</h2><p>МОЩНОСТЬ – moc · РАСХОД – przepływ · ПАРОСОДЕРЖ. – zawartość pary · ПЕРИОД – okres reaktora (czas wzrostu mocy e‑krotnie) · КАРТОГРАММА – mapa mocy kanałów · ЭВМ «СКАЛА» – komputer kontrolny bloku · ДИСП – dyspozytor · ЖУРНАЛ – dziennik · ЗАЕДАНИЕ ПРИВОДА – zacięcie napędu · ОТКАЗ – awaria · СРОЧНО – pilnie.</p>`}
@@ -664,7 +671,7 @@ function gameOver(kind){
     egg:[AV,'01:23:40 · 26.04.1986','Znalazłeś easter egg: przytrzymanie АЗ‑5 przeniosło pulpit w noc 26 kwietnia 1986. Warunki jak wtedy: moc 200 MW, ОЗР ok. 7 prętów, rdzeń zatruty ksenonem, 8 pomp na wybiegu, zabezpieczenia zablokowane. Wciśnięcie АЗ‑5 w takim stanie najpierw rozpędza reaktor. Pełne odtworzenie znajdziesz w menu.'],
     chern:[AV,'Historia się powtórzyła','Doprowadziłeś blok do stanu z 26.04.1986 i zrzuciłeś pręty z górnego położenia przy zatrutym rdzeniu i małym ОЗР. Efekt końcowy + dodatni współczynnik parowy = rozbieg na neutronach natychmiastowych.'],
     scen:[AV,'Historia się powtórzyła · 01:23','Przeprowadziłeś test i reaktor zachował się dokładnie tak jak w 1986: zrzut prętów z górnego położenia przy zatrutym rdzeniu, małym ОЗР i 8 pompach dał gwałtowny skok mocy, a para zrobiła resztę. Spróbuj jeszcze raz – i tym razem wyłącz reaktor, zanim będzie za późno.'],
-    melt:[AV,'Uszkodzenie paliwa','Paliwo zbyt długo pracowało w przegrzaniu lub bez chłodzenia. Koszulki prętów paliwowych pękły – blok wyłączony na wiele miesięcy.'],
+    melt:[AV,'Uszkodzenie paliwa → rozerwanie kanałów','Przegrzane paliwo zaczęło pękać, a jego okruchy gwałtownie odparowały wodę. Para rozpychała kanały – zdeformowane kanały zablokowały pręty, a dodatkowa para (dodatni współczynnik parowy) jeszcze podbiła moc. Aż do rozerwania rdzenia.'],
     fired:[L('УВОЛЕН','ZWOLNIONY'),'Trzy nagany – zwolnienie dyscyplinarne',S.repList.map(r=>'• '+tr(r)).join('<br>')]
   }[kind==='boom'?S.reason:kind];
   capHide();snd.rumble(false);$('bTest').style.display='none';
@@ -758,15 +765,15 @@ function replayEnd(){
 /* --- игровой сценарий --- */
 function scenarioStart(){
   newState();LOG.length=0;CINE=null;RP=null;EGG=null;capHide();snd.rumble(false);
-  S.n=0.0625;S.C=S.n;S.Tf=S.n;S.F=8/6;S.void=voidFn(S.n,S.F);S.I=1.1;S.X=1.45;
-  S.rods={RR:0,AR:0.6,USP:0.6,AZ:0};S.pumps=[1,1,1,1,1,1,1,1];S.arAuto=true;S.arSet=200;S.prot=false;S.chern=true;S.scen=true;
+  S.n=0.0625;S.C=S.n;S.Tf=S.n;S.F=8/6;S.void=voidFn(S.n,S.F);S.I=1.1;S.X=1.55;
+  S.rods={RR:0,AR:0.5,USP:0.55,AZ:0};S.pumps=[1,1,1,1,1,1,1,1];S.arAuto=true;S.arSet=200;S.prot=false;S.chern=true;S.scen=true;
   K0=0;K0=-(rodRho()+CV*(S.void-V0)-CD*(S.Tf-1)-CX*(S.X-1));
-  S.tmin=D2+68;S.dateStr='26.04.86';S.plan=200;S.nextEventAt=1e9;S.nextPlanAt=1e9;
+  S.tmin=D2+80;S.dateStr='26.04.86';S.plan=200;S.nextEventAt=1e9;S.nextPlanAt=1e9;
   log('ПУСК ГЦН-7, ГЦН-8');log('ДИСП: ДЕРЖАТЬ 200 МВт');
   game='play';setSpeed(1);$('bTest').style.display='';hideOv();
-  showOv(`<h1 style="font-size:24px">${L('НОЧЬ ИСПЫТАНИЯ','NOC TESTU')}</h1><p class="c stat">26.04.1986 · 01:08 · ${L('БЛОК 4','BLOK 4')}</p>
+  showOv(`<h1 style="font-size:24px">${L('НОЧЬ ИСПЫТАНИЯ','NOC TESTU')}</h1><p class="c stat">26.04.1986 · 01:20 · ${L('БЛОК 4','BLOK 4')}</p>
   <p>Jesteś Toptunowem. Reaktor: <b>200 MW</b>, zatruty ksenonem (który wciąż narasta), 8 pomp, prawie wszystkie pręty wyciągnięte, zabezpieczenia wyłączone. Diatłow chce przeprowadzić test: przycisk <b>${t('ТЕСТ')}</b> w nagłówku zamyka zawory turbiny i pompy 1–4 zaczynają wybieg.</p>
-  <p><b>Możesz powtórzyć historię</b> – odczekaj, aż ksenon zje ОЗР do ok. 7 (ok. 10 minut gry), uruchom test i wciśnij АЗ‑5 (osłona, potem przycisk). <b>Albo ją zmienić</b> – nie rób testu i wyłącz reaktor bezpiecznie: powoli wsuwaj РР (▼), aż moc spadnie prawie do zera. Pilnuj ОЗР – ksenon będzie go zjadał.</p>
+  <p><b>Możesz powtórzyć historię</b> – uruchom test i wciśnij АЗ‑5 (osłona, potem przycisk). <b>Albo ją zmienić</b> – nie rób testu i wyłącz reaktor bezpiecznie: powoli wsuwaj РР (▼), aż moc spadnie prawie do zera. Pilnuj ОЗР – ksenon będzie go zjadał.</p>
   <div class="row"><button class="pb sel big" data-act="resume">${L('ПРИСТУПИТЬ','DO PULPITU')}</button></div>`);
   game='pause';
 }
