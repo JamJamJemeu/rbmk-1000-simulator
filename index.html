@@ -107,7 +107,7 @@ button{font-family:inherit}
 #cap.unused{left:22px;right:auto;top:364px;bottom:auto;width:310px;height:156px;flex-direction:column;align-items:stretch;gap:4px;padding:8px 10px;font-size:13px;line-height:17px;overflow:hidden}
 #cap.mini #capT{font-size:15px}
 #cap.mini #capB{display:none}
-#plate{position:absolute;left:50%;top:529px;transform:translateX(-50%);padding:0 12px;height:11px;line-height:11px;border-radius:3px;font-size:8.5px;font-weight:700;letter-spacing:2.5px;color:#cfd8d6;background:linear-gradient(180deg,#b9bdb8,#7d827f);color:#2a2c2c;box-shadow:0 1px 1px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4);white-space:nowrap}
+#plate{cursor:pointer;z-index:3;position:absolute;left:50%;top:529px;transform:translateX(-50%);padding:0 12px;height:11px;line-height:11px;border-radius:3px;font-size:8.5px;font-weight:700;letter-spacing:2.5px;color:#cfd8d6;background:linear-gradient(180deg,#b9bdb8,#7d827f);color:#2a2c2c;box-shadow:0 1px 1px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4);white-space:nowrap}
 #fx{position:absolute;left:0;top:0;width:1100px;height:540px;pointer-events:none;z-index:4}
 </style>
 </head>
@@ -202,6 +202,7 @@ const PL={
 };
 const t=ru=>LANG==='pl'&&PL[ru]!==undefined?PL[ru]:ru;
 const TRX=[
+ [/КИЕВЭНЕРГО: ЗАДЕРЖАТЬ СНИЖЕНИЕ ДО ВЕЧЕРА/g,'KIJOWENERGO: WSTRZYMAĆ DO WIECZORA'],
  [/ПУСК ГЦН-7, ГЦН-8/g,'ROZRUCH POMP 7 I 8'],
  [/ГЦН-(\d) В РАБОТЕ/g,'POMPA $1 PRACUJE'],[/ОТКЛЮЧЕНИЕ ГЦН-(\d)!/g,'AWARIA POMPY $1!'],[/ГЦН-(\d) ОСТАНОВЛЕН/g,'POMPA $1 ZATRZYMANA'],[/ПУСК ГЦН-(\d)/g,'ROZRUCH POMPY $1'],
  [/ДИСП: В (\S+) →/g,'DYSP: O $1 →'],[/СМЕНА (\d+) ПРИНЯТА/g,'ZMIANA $1 PRZEJĘTA'],[/АР В АВТОМАТ, ЗАД\./g,'AR AUTO, ZADANE'],
@@ -381,6 +382,7 @@ function minuteTick(){
   // события
   if(S.tmin>=S.nextEventAt){
     S.nextEventAt=S.tmin+Math.max(25,60+Math.floor(Math.random()*90)-S.shift*10);
+    if(Math.random()<0.06&&S.plan<3200){S.plan=Math.min(3200,S.plan+800);S.planChangedAt=S.tmin-10;log('КИЕВЭНЕРГО: ЗАДЕРЖАТЬ СНИЖЕНИЕ ДО ВЕЧЕРА','hot');snd.chime();setSpeed(1);return;}
     const r=Math.random(),run=S.pumps.map((p,i)=>p===1?i:-1).filter(i=>i>=0);
     if(r<0.4&&run.length){const i=run[Math.floor(Math.random()*run.length)];S.pumps[i]=2;log('ОТКЛЮЧЕНИЕ ГЦН-'+(i+1)+'!','hot');snd.buzz();setSpeed(1);}
     else if(r<0.62){S.arFail=30;log('ОТКАЗ АР — РУЧНОЕ УПР.','hot');snd.buzz();setSpeed(1);}
@@ -833,10 +835,24 @@ function cineFrame(dt){
   for(const d of c.dust){d.y+=d.v*dt;d.x+=Math.sin(d.y/30)*dt*8;if(d.y>545){d.y=-5;d.x=Math.random()*1100;}}
   if(!c.end&&c.t>=(RP?9:7.5)&&(!RP||capDone())){c.end=true;if(RP)replayEnd();else if(S.scen&&!S.egg)gameOver('scen');else gameOver('boom');}
 }
+let EMG=false,EGGBUF='',clkTaps=[],plateTaps=[],GEIG=0;
+function toggleEmg(){EMG=!EMG;snd.toggle();if(EMG)tone(90,0.4,0.08,'sawtooth');}
 function drawFx(){
   const {x}=CANV.fx;x.clearRect(0,0,1100,540);
   if(EGG&&!EGG.fired){const a=0.5+0.5*Math.sin(performance.now()/90);x.font='700 64px "Roboto Mono",monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle=`rgba(255,70,40,${0.35+0.5*a})`;x.fillText('01:23:40',550,270);x.font='700 20px "Roboto Condensed",sans-serif';x.fillText('26.04.1986',550,320);}
+  if(EMG&&!CINE){x.fillStyle='rgba(0,0,0,0.42)';x.fillRect(0,0,1100,540);const fl=Math.random()<0.96?0.22:0.08;const g=x.createRadialGradient(550,40,10,550,40,760);g.addColorStop(0,`rgba(255,30,15,${fl})`);g.addColorStop(1,'rgba(255,30,15,0.05)');x.fillStyle=g;x.fillRect(0,0,1100,540);}
+  if(GEIG>0){GEIG-=1/60;if(Math.random()<0.25+0.5*(1-GEIG/3))snd.geiger();}
   const c=CINE;if(!c)return;
+  if(c.e2&&c.t>4.6){const a=Math.min(1,(c.t-4.6)*1.5),X=880,Y=380;x.globalAlpha=a;
+    x.fillStyle='#2b2f2a';x.beginPath();x.roundRect?x.roundRect(X,Y,190,120,10):x.rect(X,Y,190,120);x.fill();x.strokeStyle='#0b0c0d';x.lineWidth=3;x.stroke();
+    x.fillStyle='#d9d2b0';x.fillRect(X+12,Y+12,166,62);
+    x.strokeStyle='#222';x.lineWidth=1.5;x.beginPath();x.arc(X+95,Y+72,52,Math.PI*1.15,Math.PI*1.85);x.stroke();
+    for(let i=0;i<=4;i++){const an=Math.PI*1.15+i/4*Math.PI*0.7;x.beginPath();x.moveTo(X+95+Math.cos(an)*46,Y+72+Math.sin(an)*46);x.lineTo(X+95+Math.cos(an)*52,Y+72+Math.sin(an)*52);x.stroke();
+      x.font='700 9px "Roboto Mono",monospace';x.fillStyle='#222';x.textAlign='center';x.fillText(String(i),X+95+Math.cos(an)*38,Y+72+Math.sin(an)*38+3);}
+    const an=Math.PI*1.15+(3.6/4+Math.sin(performance.now()/60)*0.004)*Math.PI*0.7;x.strokeStyle='#b01010';x.lineWidth=2;x.beginPath();x.moveTo(X+95,Y+72);x.lineTo(X+95+Math.cos(an)*50,Y+72+Math.sin(an)*50);x.stroke();
+    x.font='700 11px "Roboto Condensed",sans-serif';x.fillStyle='#d9d2b0';x.textAlign='center';x.fillText(LANG==='pl'?'DP-5 · 3,6 R/h':'ДП-5 · 3,6 Р/ч',X+95,Y+92);
+    x.font='italic 700 10px "Roboto Condensed",sans-serif';x.fillStyle='#f0a81e';x.fillText(LANG==='pl'?'„nie tak źle… chyba?”':'«не так уж плохо… наверное?»',X+95,Y+109);
+    x.globalAlpha=1;}
   if(c.dark>0.01){x.fillStyle=`rgba(0,0,0,${c.dark})`;x.fillRect(0,0,1100,540);
     const fl=Math.random()<0.9?0.18+Math.random()*0.08:0.02;const g=x.createRadialGradient(550,60,10,550,60,700);g.addColorStop(0,`rgba(255,40,20,${fl})`);g.addColorStop(1,'rgba(255,40,20,0)');x.fillStyle=g;x.fillRect(0,0,1100,540);}
   x.lineCap='round';
@@ -901,8 +917,16 @@ stage.addEventListener('pointerdown',e=>{
 stage.addEventListener('contextmenu',e=>e.preventDefault());
 window.addEventListener('pointerup',()=>{if(azHold){azHold=null;$('az5').classList.remove('pressed');}});window.addEventListener('pointercancel',()=>{if(azHold){azHold=null;$('az5').classList.remove('pressed');}});
 const KH={ArrowUp:'RRup',ArrowDown:'RRdn',PageUp:'USPup',PageDown:'USPdn'};
-window.addEventListener('keydown',e=>{if(KH[e.code]){hold[KH[e.code]]=1;e.preventDefault();}
+window.addEventListener('keydown',e=>{if(/^\d$/.test(e.key)){EGGBUF=(EGGBUF+e.key).slice(-4);if(EGGBUF==='1986')toggleEmg();}
+  if(KH[e.code]){hold[KH[e.code]]=1;e.preventDefault();}
   if(e.repeat)return;if(e.code==='KeyA')act('ar');if(e.code==='KeyK')act('kvit');if(e.code==='KeyP'||e.code==='Escape')game==='play'?pause():game==='pause'&&act('resume');});
+$('clk').addEventListener('pointerdown',e=>{const n=performance.now();clkTaps=clkTaps.filter(t=>n-t<1500);clkTaps.push(n);if(clkTaps.length>=4){clkTaps=[];toggleEmg();}});
+$('plate').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();const n=performance.now();plateTaps=plateTaps.filter(t=>n-t<2000);plateTaps.push(n);snd.geiger();if(plateTaps.length>=5){plateTaps=[];GEIG=3;setTimeout(credits,1800);}});
+function credits(){if(game==='play')game='pause';else if(game!=='menu'&&game!=='pause')return;
+  showOv(`<h1 style="font-size:30px">☢ ${L('РБМК-1000','RBMK-1000')}</h1><p class="c stat" style="font-size:22px;margin-top:10px">by JamJam</p>
+  <p class="c">${L('Спасибо за смену, товарищ оператор.','Dzięki za zmianę, towarzyszu operatorze.')}</p>
+  <p class="c" style="color:#8f9294;font-size:13px">${L('Дозиметр показывает 3,6. Всё в порядке.','Dozymetr pokazuje 3,6. Wszystko w normie.')}</p>
+  <div class="row"><button class="pb sel big" data-act="${S&&S.t>0&&!S.over?'resume':'back'}">OK</button></div>`);}
 window.addEventListener('keyup',e=>{if(KH[e.code])hold[KH[e.code]]=0;});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(game==='play')pause();for(const k in hold)hold[k]=0;if(AC)AC.suspend().catch(()=>{});}else if(AC)AC.resume().catch(()=>{});});
 
